@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Rendered Multi Select Examples</title>
+
+  <link rel="shortcut icon" type="image/png" href="lib/jasmine-2.0.0-alpha/jasmine_favicon.png">
+  <link rel="stylesheet" type="text/css" href="/assets/token-text-area.css">
+
+  <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.0.js"></script>
+
+  <!-- include source files here... -->
+  <script type="text/javascript" src="/assets/token-text-area.js"></script>
+  
+  <style>
+    html,body {
+      font-family: sans-serif;
+    }
+    
+    .token-text-area {
+      border: 1px solid #ccc;
+      margin: 5px;
+      padding: 3px;
+    }
+    .token-text-area .token {
+      display: inline-block;
+      border-radius: 3px;
+      background-color: lightblue;
+      color: white;
+      margin: 0 3px;
+      padding: 0 3px;
+      border: none;
+    }
+  </style>
+</head>
+
+<body>
+  
+  <div class="token-text-area" contenteditable="true">
+    (<span class="token">Customer value</span> + <span class="token">Technical value</span> + <span class="token">Business value</span>) / <span class="token">Effort</span>
+  </div>
+  
+  <br/>
+  
+  <div contenteditable class="token-text-area">
+    (<input type=button class="token" value="Customer value" /> + <input type=button class="token" value="Technical value" /> + <input type=button class="token" value="Business value" />) / <input type=button class="token" value="Effort" />
+  </div>
+  
+  <script>
+    $(".rendered-multi-select").renderedMultiSelect({
+      onQuery: function(q, callback) {
+        callback([
+          {id: 123, name: "Javascript"},
+          {id: 123, name: "Scala"},
+          {id: 123, name: "Another"},
+          ]);
+      },
+      onStyleItem: function(name) {
+        return "color: red;"
+      }
+    });
+  </script>
+  
+</body>
+</html>

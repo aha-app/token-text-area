@@ -1,0 +1,144 @@
+.rendered-multi-select {
+  .rendered-multi-select-element {
+    background-color: #bbb;
+    color: white;
+    margin: 2px;
+    border-radius: 3px 3px 3px 3px;
+    padding: 3px;
+    padding-left: 6px;
+    padding-right: 6px;
+    font-size: 11px;
+    line-height: 13px;
+    cursor: default;
+  } 
+}
+
+ul.rendered-multi-select {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  min-width: 100px;
+
+  &:not([data-readonly=true]) {
+    border: 1px dotted #ddd;
+    margin: 1px;
+  }
+  
+  &:after {
+    clear: both;
+    content: "";
+    display: table;
+    line-height: 0;
+  }
+  
+  >li.rendered-multi-select-element {
+    float: left;
+    background-color: #bbb;
+    color: white;
+    margin: 2px;
+    border-radius: 3px 3px 3px 3px;
+    padding: 3px;
+    padding-left: 6px;
+    padding-right: 6px;
+    font-size: 11px;
+    line-height: 13px;
+    cursor: default;
+    
+    b {
+      padding-left: 6px;
+      color: rgba(255,255,255,0.5);
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      
+      &:hover {
+        color: rgba(255,255,255,0.9);
+      }
+    }
+  }
+  &[data-multiple=false] > li.rendered-multi-select-element {
+    float: none;
+    background-color: white;
+    color: #333;
+    font-size: 12px;
+    padding-right: 16px;
+    
+    b {
+      position: absolute;
+      right: 6px;
+      top: 3px;
+      
+      color: rgba(0,0,0,0.5);
+      
+      &:hover {
+        color: rgba(0,0,0,0.9);
+      }
+    }
+  }
+  >li.rendered-multi-select-input {
+    float: left;
+    margin: 2px;
+    .editable-input {
+      display: inline-block;
+      outline: none;
+      min-width: 10px;
+      min-height: 10px;
+      margin: 0;
+      padding: 0;
+      font-size: 11px;
+      line-height: 13px;
+      background-color: transparent;
+      margin-right: 5px;
+    }
+    .rendered-multi-select-menu {
+      position: absolute;
+      right: -1px;
+      left: -1px;
+      margin-top: 3px;
+      border: 1px solid #ccc;
+      background-color: white;
+      overflow: auto;
+      min-width: 150px;
+      min-height: 10px;
+      max-height: 250px;
+      display: none;
+      z-index: 100;
+      
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        
+        li {
+          cursor: default;
+          color: #444;
+          font-size: 13px;
+          padding: 3px;
+          padding-left: 6px;
+          
+          &:hover {
+            background-color: #eee; 
+          }
+          &.selected {
+            background-color: #eee; 
+          }
+        }
+      }
+    }
+  }
+  
+  &.rendered-multi-select-light-tags {
+    >li.rendered-multi-select-element {
+      background-color: white;
+      border: 1px solid #ccc;
+      color: #777;
+      b {
+        color: rgba(0,0,0,0.5);
+        
+        &:hover {
+          color: rgba(0,0,0,0.9);
+        }
+      }
+    }
+  }
+}
