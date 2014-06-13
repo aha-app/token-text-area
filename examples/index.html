@@ -16,48 +16,29 @@
     html,body {
       font-family: sans-serif;
     }
-    
-    .token-text-area {
-      border: 1px solid #ccc;
-      margin: 5px;
-      padding: 3px;
-    }
-    .token-text-area .token {
-      display: inline-block;
-      border-radius: 3px;
-      background-color: lightblue;
-      color: white;
-      margin: 0 3px;
-      padding: 0 3px;
-      border: none;
-    }
   </style>
 </head>
 
 <body>
   
-  <div class="token-text-area" contenteditable="true">
+  <div class="token-text-area-dummy" contenteditable="true">
     (<span class="token">Customer value</span> + <span class="token">Technical value</span> + <span class="token">Business value</span>) / <span class="token">Effort</span>
   </div>
   
   <br/>
   
-  <div contenteditable class="token-text-area">
+  <div class="token-text-area">
     (<input type=button class="token" value="Customer value" /> + <input type=button class="token" value="Technical value" /> + <input type=button class="token" value="Business value" />) / <input type=button class="token" value="Effort" />
   </div>
   
   <script>
-    $(".rendered-multi-select").renderedMultiSelect({
-      onQuery: function(q, callback) {
-        callback([
-          {id: 123, name: "Javascript"},
-          {id: 123, name: "Scala"},
-          {id: 123, name: "Another"},
-          ]);
-      },
-      onStyleItem: function(name) {
-        return "color: red;"
-      }
+    $(".token-text-area").tokenTextArea({
+      tokens: [
+        {id: "1", name: "Customer value"},
+        {id: "2", name: "Technical value"},
+        {id: "3", name: "Business value"},
+        {id: "4", name: "Effort"},
+      ]
     });
   </script>
   

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    token-text-area (1.0.27)
+    token-text-area (1.0.0)
       jquery-rails
       less-rails-bootstrap
       rails (~> 3.1)
