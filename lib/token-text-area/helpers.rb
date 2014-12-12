@@ -5,14 +5,13 @@ module TokenTextArea
       options.symbolize_keys!
 
       readonly = !!options[:readonly]
-      autocomplete = options[:autocomplete]
       html_options = options[:html] || {}
+      data_options = options[:data] || {}
+      data_options.merge!({readonly: readonly})
       tag_options = html_options.merge(
         class: "token-text-area #{html_options[:class]}",
-        data: {
-          readonly: readonly,
-          autocomplete: autocomplete
-        })
+        data: data_options
+      )
       
       container_tag = options[:container_tag] || :div
       
@@ -36,8 +35,6 @@ module TokenTextArea
         s.html_safe
       end
     end
-    
-    
     
   private
     def editor_item(item)

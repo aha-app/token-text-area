@@ -5,25 +5,9 @@ class TokenTextArea
 
     @element.attr "contenteditable", "true"
 
-    @autocompletes = JSON.parse @element.attr("data-autocomplete")
-    @input = $ "<input>"
-    @input.css "display", "none"
-    
-    @element.append @input
+    @registerEvents()
 
-    names = @autocompletes.map (elem) ->
-      elem[0]
-
-    @input.typeahead(
-      hint: true
-      highlight: true
-      minLength: 1
-    ,
-      name: 'states'
-      local: names
-      source: @substringMatcher(names)
-    )
-
+  registerEvents: ->
     @element.on "click", (event) =>
       target = $(event.target)
 
@@ -53,6 +37,11 @@ class TokenTextArea
       else
         @addToken()
 
+  createResultMenu: ->
+    @resultMenu = $("<div class='token-text-area-menu'><ul class='token-text-area-results'></ul></div")
+    @resultMenu.insertAfter(@input)
+    @resultList = @resultMenu.find("ul")
+
   setFocus: (index) ->
     sel = window.getSelection()
     range = document.createRange()
@@ -65,13 +54,13 @@ class TokenTextArea
     # Get the word before the cursor.
     range = @getText()
     if range.match(/[a-z]+$/i) != null
-      @openAutocomplete(range.trim())
+      q = $.trim(range)
+      if @options.onQuery
+        @options.onQuery q, (results) =>
+          @showQueryResults(results)
     else if (reg = range.match(/[0-9]+(.[0-9]+)?[^0-9|.]$/i))
       val = reg[0]
       @add('num', val.substr(0, val.length - 1))
-      if val.substr(val.length - 1).match(/[\+|\-|\*|\/|^|\(|\)]$/i)
-        @add('sym', val.substr(val.length - 1))
-        
     else if (reg = range.match(/[\+|\-|\*|\/|^|\(|\)]$/i))
       @add('sym', reg[0])
 
@@ -98,15 +87,13 @@ class TokenTextArea
         $(@element.children()[offset - 1]).after newToken
         @setFocus offset + 1
 
-  openAutocomplete: (val) ->
-    @input.typeahead 'val', val
+  showQueryResults: (results) =>
+    console.log results
+    @resultList.empty()
 
-    @element.find('.tt-suggestion').off 'click'
-    @element.find('.tt-suggestion').on 'click', (e) =>
-      @add 'token', $(e.currentTarget).text()
+    @resultList.append("<li>#{result}</li>") for result in results
 
-  closeAutocomplete: ->
-    @input.typeahead 'close'
+    @resultMenu.show()
 
   isArrow: (keycode) ->
     $.inArray(keycode, [37, 38, 39, 40]) != -1
