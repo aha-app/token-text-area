@@ -1,18 +1,51 @@
 .token-text-area {
-  border: 1px solid #ccc;
+  border: none;
   margin: 5px;
   padding: 8px;
-  font-size: 16px;
-  font-weight: bold;
+
+  &:focus, input:focus {
+    outline: 0;
+  }
+
+  &::selection {
+    background: transparent;
+  }
+
+  input {
+    margin: 0 3px 0 3px;
+    display: inline-block;
+    &::selection {
+      background: transparent;
+      color: red;
+    }
+  }
   
   .token {
-    display: inline-block;
     border-radius: 10px;
-    margin: 0 3px;
     padding: 0 10px;
     border: none;
     font-size: 12px;
     background-color: #FBE1B0;
     font-weight: 300;
+  }
+
+  .token-sym {
+    padding: 0;
+    border: none;
+    font-size: 16px;
+    background-color: transparent;
+    font-weight: bold;
+  }
+
+  .tt-dropdown-menu {
+    border: solid black 1px;
+    padding: 3px;
+    background-color: white;
+    top: 125px;
+    width: 125px;
+
+    p {
+      margin: 0;
+    }
   }
 }

@@ -1,1 +1,2 @@
 //= require ./control
+//= require ./typeahead

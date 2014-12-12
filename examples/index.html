@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>Rendered Multi Select Examples</title>
+  <title>Token Text Area Examples</title>
 
   <link rel="shortcut icon" type="image/png" href="lib/jasmine-2.0.0-alpha/jasmine_favicon.png">
   <link rel="stylesheet" type="text/css" href="/assets/token-text-area.css">
@@ -10,6 +10,7 @@
   <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.0.js"></script>
 
   <!-- include source files here... -->
+  <script type="text/javascript" src="/assets/typeahead.js"></script>
   <script type="text/javascript" src="/assets/token-text-area.js"></script>
   
   <style>
@@ -27,19 +28,14 @@
   
   <br/>
   
-  <div class="token-text-area">
-    (<input type=button class="token" value="Customer value" /> + <input type=button class="token" value="Technical value" /> + <input type=button class="token" value="Business value" />) / <input type=button class="token" value="Effort" />
+  <div id="ta" class="token-text-area" data-autocomplete='[["Pizzazz","456"],["Wow","789"]]'>
+    <input class="token-sym" type="button" value="("><input type=button class="token" value="Customer value" /><input class="token-sym" type="button" value="+"><input type=button class="token" value="Technical value" /><input class="token-sym" type="button" value="+"><input type=button class="token" value="Business value" /><input class="token-sym" type="button" value=")"><input class="token-sym" type="button" value="/"><input type=button class="token" value="Effort" />
   </div>
+
+  <p>Type 'Pizzazz' or 'Wow'</p>
   
   <script>
-    $(".token-text-area").tokenTextArea({
-      tokens: [
-        {id: "1", name: "Customer value"},
-        {id: "2", name: "Technical value"},
-        {id: "3", name: "Business value"},
-        {id: "4", name: "Effort"},
-      ]
-    });
+    $(".token-text-area").tokenTextArea();
   </script>
   
 </body>
