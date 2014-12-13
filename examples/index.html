@@ -10,7 +10,6 @@
   <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.0.js"></script>
 
   <!-- include source files here... -->
-  <script type="text/javascript" src="/assets/typeahead.js"></script>
   <script type="text/javascript" src="/assets/token-text-area.js"></script>
   
   <style>
@@ -29,10 +28,8 @@
   <br/>
   
   <div id="ta" class="token-text-area" data-autocomplete='[["Pizzazz","456"],["Wow","789"]]'>
-    <input class="token-sym" type="button" value="("><input type=button class="token" value="Customer value" /><input class="token-sym" type="button" value="+"><input type=button class="token" value="Technical value" /><input class="token-sym" type="button" value="+"><input type=button class="token" value="Business value" /><input class="token-sym" type="button" value=")"><input class="token-sym" type="button" value="/"><input type=button class="token" value="Effort" />
+    (<input class="token" data-id="123" type="button" value="Customer value" />+<input class="token" data-id="456" type="button" value="Technical value" />+<input class="token" data-id="789" type="button" value="Business value" />)/<input class="token" data-id="012" type="button" value="Effort" />
   </div>
-
-  <p>Type 'Pizzazz' or 'Wow'</p>
   
   <script>
     $(".token-text-area").tokenTextArea();

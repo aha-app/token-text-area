@@ -1,9 +1,25 @@
 .token-text-area {
   border: none;
-  margin: 5px;
+  font-size: 14px;
+  font-weight: bold;
   padding: 8px;
+  display: inline;
+  border-style: solid;
+  border-width: 1px;
 
-  &:focus, input:focus {
+  &.valid {
+    border-color: #64b80b;
+  }
+  
+  &.invalid {
+    border-color: red;
+  }
+
+  &.maybevalid {
+    border-color: #E0E0E0;
+  }
+
+  &:focus {
     outline: 0;
   }
 
@@ -11,50 +27,51 @@
     background: transparent;
   }
 
-  input {
-    margin: 0 3px 0 3px;
-    display: inline-block;
-    &::selection {
-      background: transparent;
-      color: red;
-    }
-  }
-  
-  .token {
-    border-radius: 10px;
-    padding: 0 10px;
-    border: none;
-    font-size: 12px;
-    background-color: #FBE1B0;
-    font-weight: 300;
-  }
+  .token-text-area-input {
+    display: inline;
 
-  .token-sym {
-    padding: 0;
-    border: none;
-    font-size: 16px;
-    background-color: transparent;
-    font-weight: bold;
+    &:focus, input:focus {
+      outline: 0;
+    }
+
+    .token {
+      border-radius: 10px;
+      padding: 0 10px;
+      border: none;
+      font-size: 12px;
+      background-color: #FBE1B0;
+      font-weight: 300;
+      margin: 0 3px 0 3px;
+      display: inline-block;
+      &::selection {
+        background: transparent;
+        color: red;
+      }
+    }
   }
 
   .token-text-area-menu {
     position: absolute;
-    right: -1px;
-    left: -1px;
+    // right: -1px;
+    // left: -1px;
     margin-top: 3px;
     border: 1px solid #ccc;
     background-color: white;
-    overflow: auto;
     min-width: 150px;
     min-height: 10px;
     max-height: 250px;
     display: none;
     z-index: 100;
+    text-indent: 0px;
+    box-sizing: border-box;
     
     ul {
+      display: inline-block;
       list-style: none;
       margin: 0;
       padding: 0;
+      width: 100%;
+      box-sizing: border-box;
       
       li {
         cursor: default;
@@ -62,26 +79,15 @@
         font-size: 13px;
         padding: 3px;
         padding-left: 6px;
+        width: 100%;
+        box-sizing: border-box;
         
         &:hover {
+          cursor: pointer;
           background-color: #eee; 
         }
         &.selected {
           background-color: #eee; 
-        }
-
-        &.header-row {
-          color: #777;
-          font-size: 13px;
-
-          &:hover, &.selected {
-            background-color: #fff !important;
-            color: #777 !important;
-          }
-        }
-
-        &.has-parent {
-          padding-left: 20px;
         }
       }
     }

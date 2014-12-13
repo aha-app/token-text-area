@@ -1,7 +1,7 @@
 module TokenTextArea
   module TokenTextAreaHelpers
     
-    def token_text_area(elements, options = {})
+    def token_text_area(equation, metrics, options = {})
       options.symbolize_keys!
 
       readonly = !!options[:readonly]
@@ -9,41 +9,23 @@ module TokenTextArea
       data_options = options[:data] || {}
       data_options.merge!({readonly: readonly})
       tag_options = html_options.merge(
-        class: "token-text-area #{html_options[:class]}",
+        class: "token-text-area valid #{html_options[:class]}",
         data: data_options
       )
       
       container_tag = options[:container_tag] || :div
       
       content_tag(container_tag, tag_options) do
-        s = ""
-        elements.each do |element|
-          text, value = editor_item(element)
-          if value.nil?
-            s << content_tag(:input, type: :button, class: 'token-sym', value: text.html_safe) do; end
-          else
-            if block_given?
-              style = yield text
-            else
-              style = nil
+        content_tag(:div, class: 'token-text-area-input') do
+          unless equation.nil?
+            equation.gsub(/#*#/) do 
+              cur_match = Regexp.last_match
+              metric = metrics.find_by_metric_id(cur_match.gsub('#','').to_i)
+              content_tag(:input, type: :button, class: 'token', data: { id: metric.id }, value: metric.name.html_safe)
             end
-            
-            s << content_tag(:input, type: :button, class: 'token', data: { id: value }, style: style, value: text.html_safe) do; end
+            equation.html_safe
           end
         end
-        
-        s.html_safe
-      end
-    end
-    
-  private
-    def editor_item(item)
-      # Items are [text, id] pairs (i.e. tokens), numbers, or mathematical operators.
-      case
-      when !item.is_a?(String) && item.respond_to?(:first) && item.respond_to?(:last)
-        [item.first, item.last]
-      else
-        [item, nil]
       end
     end
   end
