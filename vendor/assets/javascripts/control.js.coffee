@@ -80,7 +80,7 @@ class TokenTextArea
 
         $("li[data-id=" + selected.attr("data-id") + "]").addClass("selected") unless selected is null
 
-        if $(@input).is(":focus") and @resultList.length > 0
+        if $(@input).is(":focus") and @resultList.find("li").length > 0
           @resultMenu.css("display", "inline-block") 
         else
           @resultMenu.hide()
