@@ -7,6 +7,10 @@
   border-style: solid;
   border-width: 1px;
 
+  &.noborder {
+    border: none;
+  }
+
   &.valid {
     border-color: #64b80b;
   }
@@ -29,6 +33,7 @@
 
   .token-text-area-input {
     display: inline;
+    line-height: 100%;
 
     &:focus, input:focus {
       outline: 0;

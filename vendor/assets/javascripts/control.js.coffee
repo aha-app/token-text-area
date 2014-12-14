@@ -1,10 +1,13 @@
 class TokenTextArea
-  TOKEN_REGEX: /<input class="token" data-id="[0-9]+" type="button" value="[^"]+">/i
+  TOKEN_REGEX: /<input class="token" data-id="[0-9]+" id="" type="button" value="[^"]+">/i
   ID_REGEX: /data-id="[0-9]+"/i
   WORD_REGEX: /[a-z]+$/i
 
   constructor: (@element, @options = {}) ->
-    return if @element.data("readonly") is "true"
+    # Remove outline and return if readonly (display) mode.
+    if @element.data("readonly") is true
+      @element.addClass "noborder"
+      return
 
     @input = @element.find(".token-text-area-input")
 
@@ -30,7 +33,7 @@ class TokenTextArea
       if wordReg is null
         @closeAutocomplete()
       else
-        @word = wordReg[0]
+        @word = wordReg
         @openAutocomplete()
 
       unless @isArrow(event.which)
@@ -68,7 +71,7 @@ class TokenTextArea
 
   openAutocomplete: () ->
     if @options.onQuery
-      @options.onQuery @word, (results) =>
+      @options.onQuery @word[0], (results) =>
         selected = @resultList.find(".selected")
         @closeAutocomplete()
         
@@ -106,11 +109,14 @@ class TokenTextArea
   addItem: (result) ->
     id = result.attr("data-id")
     return false unless id
+
+    # Replace typing with token.
     name = result.html()
-    token = '<input class="token" data-id="' + id + '" type="button" value="' + name + '">'
-    @input.html(@input.html().replace(@word, token))
+    token = '<input class="token" data-id="' + id + '" id="" type="button" value="' + name + '">'
+    @input.html(@input.html().substr(0, @word.index) + token + @input.html().substr(@word.index + @word[0].length))
+
+    # Close menu and reset.
     @closeAutocomplete()
-    $(".token[data-id=" + id + "]").click()
     @word = null
     @resultList.html ''
     @checkEquation()

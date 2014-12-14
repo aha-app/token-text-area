@@ -18,10 +18,10 @@ module TokenTextArea
       content_tag(container_tag, tag_options) do
         content_tag(:div, class: 'token-text-area-input') do
           unless equation.nil?
-            equation.gsub(/#*#/) do 
-              cur_match = Regexp.last_match
-              metric = metrics.find_by_metric_id(cur_match.gsub('#','').to_i)
-              content_tag(:input, type: :button, class: 'token', data: { id: metric.id }, value: metric.name.html_safe)
+            equation.gsub!(/#[0-9]+#/) do 
+              cur_match = Regexp.last_match.to_s
+              metric = metrics.find(cur_match.gsub('#','').to_i)
+              text_field_tag(nil, metric.name.html_safe, type: :button, class: 'token', data: { id: metric.id })
             end
             equation.html_safe
           end
