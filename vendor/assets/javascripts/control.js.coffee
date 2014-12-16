@@ -1,5 +1,5 @@
 class TokenTextArea
-  TOKEN_REGEX: /<span class="token" data-id="[0-9]+" contenteditable="false">.+<\/span>/i
+  TOKEN_REGEX: /<span class="token" (contenteditable="false" data-id="[0-9]+"|data-id="[0-9]+" contenteditable="false")>[^<]+<\/span>/i
   ID_REGEX: /data-id="[0-9]+"/i
   WORD_REGEX: /[a-z]+$/i
 
@@ -12,6 +12,11 @@ class TokenTextArea
     @input = @element.find(".token-text-area-input")
 
     @input.attr "contenteditable", "true"
+    @input.find(".token").attr("contenteditable", "false")
+
+    @element.after('<div style="color: #b94a48; padding-left: 80px; margin-top: 10px; font-size: 12px; line-height: 16px;">Syntax error in formula.</div>')
+    @errorMsg = @element.next()
+    @errorMsg.hide()
 
     @typingTimer = null
     @resultMenu = null
@@ -31,13 +36,7 @@ class TokenTextArea
       return false
 
     @input.on "keyup paste input", (event) =>
-      # Open autocomplete menu if it's a word.
-      wordReg = @getSelection().match @WORD_REGEX
-      if wordReg is null
-        @closeAutocomplete()
-      else
-        @word = wordReg
-        @openAutocomplete()
+      @checkAutocomplete()
 
       # Spans lose contenteditable attr when pasted. (!?)
       @input.find(".token").attr("contenteditable", "false")
@@ -46,6 +45,7 @@ class TokenTextArea
         @element.removeClass "valid"
         @element.removeClass "invalid"
         @element.addClass "maybevalid"
+        @errorMsg.hide()
 
         clearTimeout(@typingTimer) unless @typingTimer is null
         @typingTimer = setTimeout( =>
@@ -75,7 +75,22 @@ class TokenTextArea
           else
             return
 
-  openAutocomplete: () ->
+    @input.on "click", (event) =>
+      @checkAutocomplete()
+
+    @input.on "blur", (event) =>
+      @closeAutocomplete()
+
+  checkAutocomplete: ->
+    # Open autocomplete menu if it's a word.
+    wordReg = @getSelection().match @WORD_REGEX
+    if wordReg is null
+      @closeAutocomplete()
+    else
+      @word = wordReg
+      @openAutocomplete()
+
+  openAutocomplete: ->
     if @options.onQuery
       @options.onQuery @word[0], (results) =>
         selected = @resultList.find(".selected")
@@ -144,10 +159,12 @@ class TokenTextArea
           @element.removeClass "maybevalid"
           @element.removeClass "invalid"
           @element.addClass "valid"
+          @errorMsg.hide()
         else
           @element.removeClass "maybevalid"
           @element.removeClass "valid"
           @element.addClass "invalid"
+          @errorMsg.show()
 
   existingNames: ->
     @element.find(".token-text-area-results li")
