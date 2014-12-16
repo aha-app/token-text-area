@@ -22,6 +22,7 @@ class TokenTextArea
     @resultMenu = null
     @resultList = null
     @word = null
+    @strippedChars = 0
 
     @createResultMenu()
 
@@ -31,10 +32,6 @@ class TokenTextArea
     @noNewLines()
 
   registerEvents: ->
-    @element.on "click", ".token-text-area-menu li", (event) =>
-      @addItem($(event.target))
-      return false
-
     @input.on "keyup paste input", (event) =>
       @checkAutocomplete()
 
@@ -79,7 +76,10 @@ class TokenTextArea
       @checkAutocomplete()
 
     @input.on "blur", (event) =>
-      @closeAutocomplete()
+      # If menu was clicked, wait for element to be added.
+      setTimeout(=>
+        @closeAutocomplete()
+      , 100)
 
   checkAutocomplete: ->
     # Open autocomplete menu if it's a word.
@@ -102,7 +102,11 @@ class TokenTextArea
         $("li[data-id=" + selected.attr("data-id") + "]").addClass("selected") unless selected is null
 
         if $(@input).is(":focus") and @resultList.find("li").length > 0
-          @resultMenu.css("display", "inline-block") 
+          @resultMenu.css("display", "inline-block")
+          @element.off "click", ".token-text-area-menu li"
+          @element.on "click", ".token-text-area-menu li", (event) =>
+            @addItem($(event.target))
+            return false
         else
           @resultMenu.hide()
 
@@ -134,7 +138,8 @@ class TokenTextArea
     # Replace typing with token.
     name = result.html()
     token = '<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>'
-    @input.html(@input.html().substr(0, @word.index) + token + @input.html().substr(@word.index + @word[0].length))
+    index = @word.index + @strippedChars
+    @input.html(@input.html().substr(0, index) + token + @input.html().substr(index + @word[0].length))
 
     # Close menu and reset.
     @closeAutocomplete()
@@ -150,7 +155,7 @@ class TokenTextArea
     while (token = equation.match(@TOKEN_REGEX)) != null
       idReg = token[0].match(@ID_REGEX)
       id = idReg[0].replace('data-id="', '').replace('"', '')
-      equation = equation.replace(@TOKEN_REGEX, '#' + id + '#')
+      equation = equation.replace(@TOKEN_REGEX, ' #' + id + '# ')
     
     # Check with server to find if expression is valid.
     if @options.onChange
@@ -191,7 +196,8 @@ class TokenTextArea
     range.toString().length
 
   getSelection: ->
-    caretPos = origCaretPos = @getCaretPos()
+    caretPos = @getCaretPos()
+    @strippedChars = 0
 
     # Remove each token in range and remove them from the caret position.
     # Otherwise, autocomplete suggestions will include existing tokens.
@@ -199,8 +205,9 @@ class TokenTextArea
 
     while html.find('.token').length > 0
       token = $(html.find('.token').first())
-      break unless @input.text().indexOf(token.text()) < origCaretPos
+      break unless html.text().indexOf(token.text()) < caretPos
       caretPos -= token.text().length
+      @strippedChars += token[0].outerHTML.length
       newContents = html.contents().not(token)
       html.empty().append(newContents)
 
