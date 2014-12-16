@@ -21,7 +21,7 @@ module TokenTextArea
             equation.gsub!(/#[0-9]+#/) do 
               cur_match = Regexp.last_match.to_s
               metric = metrics.detect{ |m| m[:id] == cur_match.gsub('#','').to_i }
-              content_tag(:span, class: 'token', data: { id: metric[:id] }, contenteditable: 'false') do
+              content_tag(:span, class: 'token', data: { id: metric[:id] }) do
                 label = metric[:name]
                 label += "&nbsp;<b>#{values.detect{ |v| v[:metric_id] == metric[:id] }[:value].to_s}</b>" if values
                 label.html_safe

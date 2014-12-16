@@ -1,5 +1,5 @@
 class TokenTextArea
-  TOKEN_REGEX: /<span class="token" contenteditable="false" data-id="[0-9]+">.+<\/span>/i
+  TOKEN_REGEX: /<span class="token" data-id="[0-9]+" contenteditable="false">.+<\/span>/i
   ID_REGEX: /data-id="[0-9]+"/i
   WORD_REGEX: /[a-z]+$/i
 
@@ -22,6 +22,9 @@ class TokenTextArea
 
     @registerEvents()
 
+    @forceSpace()
+    @noNewLines()
+
   registerEvents: ->
     @element.on "click", ".token-text-area-menu li", (event) =>
       @addItem($(event.target))
@@ -29,12 +32,15 @@ class TokenTextArea
 
     @input.on "keyup paste input", (event) =>
       # Open autocomplete menu if it's a word.
-      wordReg = @input.html().match @WORD_REGEX
+      wordReg = @getSelection().match @WORD_REGEX
       if wordReg is null
         @closeAutocomplete()
       else
         @word = wordReg
         @openAutocomplete()
+
+      # Spans lose contenteditable attr when pasted. (!?)
+      @input.find(".token").attr("contenteditable", "false")
 
       unless @isArrow(event.which)
         @element.removeClass "valid"
@@ -120,6 +126,8 @@ class TokenTextArea
     @word = null
     @resultList.html ''
     @checkEquation()
+    @forceSpace()
+    @noNewLines()
 
   checkEquation: ->
     # Replace tokens with #id#.
@@ -155,6 +163,38 @@ class TokenTextArea
 
   isArrow: (code) ->
     $.inArray(code, [37, 38, 39, 40]) != -1
+
+  getCaretPos: ->
+    if window.getSelection and window.getSelection().rangeCount > 0
+      range = window.getSelection().getRangeAt(0).cloneRange()
+    else
+      range = document.selection.createRange()
+    range.collapse(true)
+    range.setStart(@element[0], 0)
+    range.toString().length
+
+  getSelection: ->
+    caretPos = origCaretPos = @getCaretPos()
+
+    # Remove each token in range and remove them from the caret position.
+    # Otherwise, autocomplete suggestions will include existing tokens.
+    html = $('<p>' + @input.html() + '</p>')
+
+    while html.find('.token').length > 0
+      token = $(html.find('.token').first())
+      break unless @input.text().indexOf(token.text()) < origCaretPos
+      caretPos -= token.text().length
+      newContents = html.contents().not(token)
+      html.empty().append(newContents)
+
+    html.text().substr(0, caretPos)
+
+  forceSpace: ->
+    html = @input.html()
+    @input.append('&nbsp;') unless html.substr(html.length - 6) is '&nbsp;'
+
+  noNewLines: ->
+    @input.html(@input.html().replace(/(<br>|\n)/g, ''))
       
 $.fn.tokenTextArea = (options, args...) ->
   @each ->
