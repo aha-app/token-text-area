@@ -1,5 +1,5 @@
 class TokenTextArea
-  TOKEN_REGEX: /<input class="token" data-id="[0-9]+" id="" type="button" value="[^"]+">/i
+  TOKEN_REGEX: /<span class="token" contenteditable="false" data-id="[0-9]+">.+<\/span>/i
   ID_REGEX: /data-id="[0-9]+"/i
   WORD_REGEX: /[a-z]+$/i
 
@@ -112,7 +112,7 @@ class TokenTextArea
 
     # Replace typing with token.
     name = result.html()
-    token = '<input class="token" data-id="' + id + '" id="" type="button" value="' + name + '">'
+    token = '<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>'
     @input.html(@input.html().substr(0, @word.index) + token + @input.html().substr(@word.index + @word[0].length))
 
     # Close menu and reset.
