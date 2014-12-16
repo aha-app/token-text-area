@@ -22,14 +22,10 @@ class TokenTextArea
     @resultMenu = null
     @resultList = null
     @word = null
-    @strippedChars = 0
 
     @createResultMenu()
 
     @registerEvents()
-
-    @forceSpace()
-    @noNewLines()
 
   registerEvents: ->
     @input.on "keyup paste input", (event) =>
@@ -48,6 +44,9 @@ class TokenTextArea
         @typingTimer = setTimeout( =>
           @checkEquation()
         , 100)
+
+    @input.on "paste", (event) =>
+      @input.html(@input.html().replace(/(<br>|\n)/g, ''))
 
     @input.on "keydown", (event) =>
       clearTimeout(@typingTimer) unless @typingTimer is null
@@ -75,11 +74,9 @@ class TokenTextArea
     @input.on "click", (event) =>
       @checkAutocomplete()
 
-    @input.on "blur", (event) =>
-      # If menu was clicked, wait for element to be added.
-      setTimeout(=>
-        @closeAutocomplete()
-      , 100)
+    # @input.on "blur", (event) =>
+    #   console.log $(event.target)
+    #   @closeAutocomplete()
 
   checkAutocomplete: ->
     # Open autocomplete menu if it's a word.
@@ -132,22 +129,42 @@ class TokenTextArea
       $(items[currentIndex]).addClass("selected")
 
   addItem: (result) ->
-    id = result.attr("data-id")
+    id = result.data('id')
     return false unless id
 
     # Replace typing with token.
     name = result.html()
     token = '<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>'
-    index = @word.index + @strippedChars
-    @input.html(@input.html().substr(0, index) + token + @input.html().substr(index + @word[0].length))
+    sel = window.getSelection()
+    console.log sel
+    if (sel.getRangeAt && sel.rangeCount)
+      # Set range to metric name fragment.
+      range = sel.getRangeAt(0)
+      range.setStart(range.startContainer, range.endOffset - @word[0].length)
+      range.deleteContents()
+
+      # Create and insert new token.
+      node = document.createElement('span')
+      node.className = 'token'
+      node.contentEditable = false
+      node.dataset.id = id
+      node.innerHTML = name
+      range.insertNode(document.createTextNode(' '));
+      range.insertNode(node)
+      range.insertNode(document.createTextNode(' '));
+
+      # Set selection range (i.e. caret position) to token.
+      range = range.cloneRange()
+      range.setStartAfter(node)
+      range.collapse(true)
+      sel.removeAllRanges()
+      sel.addRange(range)
 
     # Close menu and reset.
     @closeAutocomplete()
     @word = null
     @resultList.html ''
     @checkEquation()
-    @forceSpace()
-    @noNewLines()
 
   checkEquation: ->
     # Replace tokens with #id#.
@@ -197,7 +214,6 @@ class TokenTextArea
 
   getSelection: ->
     caretPos = @getCaretPos()
-    @strippedChars = 0
 
     # Remove each token in range and remove them from the caret position.
     # Otherwise, autocomplete suggestions will include existing tokens.
@@ -207,18 +223,10 @@ class TokenTextArea
       token = $(html.find('.token').first())
       break unless html.text().indexOf(token.text()) < caretPos
       caretPos -= token.text().length
-      @strippedChars += token[0].outerHTML.length
       newContents = html.contents().not(token)
       html.empty().append(newContents)
 
     html.text().substr(0, caretPos)
-
-  forceSpace: ->
-    html = @input.html()
-    @input.append('&nbsp;') unless html.substr(html.length - 6) is '&nbsp;'
-
-  noNewLines: ->
-    @input.html(@input.html().replace(/(<br>|\n)/g, ''))
       
 $.fn.tokenTextArea = (options, args...) ->
   @each ->
