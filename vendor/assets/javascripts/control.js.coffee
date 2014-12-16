@@ -123,7 +123,7 @@ class TokenTextArea
 
   checkEquation: ->
     # Replace tokens with #id#.
-    equation = @input.html().replace('&nbsp;', '')
+    equation = @input.html().replace(/&nbsp;/g, ' ')
     while (token = equation.match(@TOKEN_REGEX)) != null
       idReg = token[0].match(@ID_REGEX)
       id = idReg[0].replace('data-id="', '').replace('"', '')
