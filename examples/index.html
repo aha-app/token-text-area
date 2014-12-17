@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>Rendered Multi Select Examples</title>
+  <title>Token Text Area Examples</title>
 
   <link rel="shortcut icon" type="image/png" href="lib/jasmine-2.0.0-alpha/jasmine_favicon.png">
   <link rel="stylesheet" type="text/css" href="/assets/token-text-area.css">
@@ -27,19 +27,12 @@
   
   <br/>
   
-  <div class="token-text-area">
-    (<input type=button class="token" value="Customer value" /> + <input type=button class="token" value="Technical value" /> + <input type=button class="token" value="Business value" />) / <input type=button class="token" value="Effort" />
+  <div id="ta" class="token-text-area" data-autocomplete='[["Pizzazz","456"],["Wow","789"]]'>
+    (<input class="token" data-id="123" type="button" value="Customer value" />+<input class="token" data-id="456" type="button" value="Technical value" />+<input class="token" data-id="789" type="button" value="Business value" />)/<input class="token" data-id="012" type="button" value="Effort" />
   </div>
   
   <script>
-    $(".token-text-area").tokenTextArea({
-      tokens: [
-        {id: "1", name: "Customer value"},
-        {id: "2", name: "Technical value"},
-        {id: "3", name: "Business value"},
-        {id: "4", name: "Effort"},
-      ]
-    });
+    $(".token-text-area").tokenTextArea();
   </script>
   
 </body>
