@@ -35,6 +35,15 @@
     display: inline-block;
     line-height: 16px;
     font-size: 14px;
+    overflow: hidden;
+
+    br {
+      display:none;
+    }
+
+    * {
+      white-space:nowrap;
+    }
 
     &:focus, input:focus {
       outline: 0;
@@ -58,7 +67,7 @@
 
   .token-text-area-menu {
     position: absolute;
-    margin-top: 9px;
+    margin-top: 28px;
     margin-left: -8px;
     border: 1px solid #ccc;
     background-color: white;
