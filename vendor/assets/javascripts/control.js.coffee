@@ -77,10 +77,10 @@ class TokenTextArea
     @input.on "click", (event) =>
       @checkAutocomplete()
 
-    # @input.on "blur", (event) =>
-    #   setTimeout( =>
-    #     @closeAutocomplete()
-    #   , 100)
+    @input.on "blur", (event) =>
+      setTimeout( =>
+        @resultMenu.hide() unless @resultMenu.is(":active")
+      )
 
   checkAutocomplete: ->
     # Open autocomplete menu if it's a word.
