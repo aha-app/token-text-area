@@ -220,7 +220,7 @@ class TokenTextArea
 
   checkEquation: ->
     # Replace tokens with #id#.
-    equation = @stripNbsp(@input.html())
+    equation = @fixHtmlTags(@input.html())
     while (token = equation.match(@TOKEN_REGEX)) != null
       idReg = token[0].match(@ID_REGEX)
       id = idReg[0].replace('data-id="', '').replace('"', '')
@@ -265,11 +265,13 @@ class TokenTextArea
 
     html.text().substr(0, caretPos)
 
-  stripNbsp: (string) ->
-    string.replace(/&nbsp;/g, '')
+  fixHtmlTags: (string) ->
+    string = string.replace(/&nbsp;/g, '')
+    string = string.replace(/&gt;/g, '>')
+    string = string.replace(/&lt;/g, '<')
 
   fixWhitespace: ->
-    html = @stripNbsp(@input.html())
+    html = @fixHtmlTags(@input.html())
     html = html.replace(/&nbsp;/g, ' ')
     html = html.replace(/[\s]+/g, ' ')
     @input.html(html)
