@@ -63,14 +63,6 @@ class TokenTextArea
           @checkEquation()
         , 100)
 
-    @input.on "paste", (event) =>
-      # Remove any newlines they may have pasted in.
-      @input.html(@input.html().replace(/(<br>|\n)/g, ''))
-
-      # Remove any other elements they may have pasted in.
-      content = $('<p>' + @input.html() + '</p>')
-      content.children().not('.token').remove()
-
     @input.on "keydown", (event) =>
       clearTimeout(@typingTimer) unless @typingTimer is null
 
@@ -219,6 +211,13 @@ class TokenTextArea
     return false
 
   checkEquation: ->
+    # Remove any newlines they may have pasted in.
+    @input.html(@input.html().replace(/(<br>|\n)/g, ''))
+
+    # Remove any other elements they may have pasted in.
+    @input.children(':not(.token)').each ->
+      $(this).replaceWith($(this).html())
+
     # Replace tokens with #id#.
     equation = @fixHtmlTags(@input.html())
     while (token = equation.match(@TOKEN_REGEX)) != null
