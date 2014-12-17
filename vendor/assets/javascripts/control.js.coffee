@@ -22,6 +22,7 @@ class TokenTextArea
     @resultMenu = null
     @resultList = null
     @word = null
+    @range = null
 
     @createResultMenu()
 
@@ -29,6 +30,8 @@ class TokenTextArea
 
   registerEvents: ->
     @input.on "keyup paste input", (event) =>
+      @range = @getRange()
+
       @checkAutocomplete()
 
       # Spans lose contenteditable attr when pasted. (!?)
@@ -75,8 +78,9 @@ class TokenTextArea
       @checkAutocomplete()
 
     # @input.on "blur", (event) =>
-    #   console.log $(event.target)
-    #   @closeAutocomplete()
+    #   setTimeout( =>
+    #     @closeAutocomplete()
+    #   , 100)
 
   checkAutocomplete: ->
     # Open autocomplete menu if it's a word.
@@ -132,16 +136,19 @@ class TokenTextArea
     id = result.data('id')
     return false unless id
 
-    # Replace typing with token.
+    # Create new token.
     name = result.html()
     token = '<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>'
+    
+    # Re-place the caret (necessary if the user clicked on the autocomplete menu).
     sel = window.getSelection()
-    console.log sel
+    sel.removeAllRanges()
+    sel.addRange(@range)
+
     if (sel.getRangeAt && sel.rangeCount)
       # Set range to metric name fragment.
-      range = sel.getRangeAt(0)
-      range.setStart(range.startContainer, range.endOffset - @word[0].length)
-      range.deleteContents()
+      @range.setStart(@range.startContainer, @range.endOffset - @word[0].length)
+      @range.deleteContents()
 
       # Create and insert new token.
       node = document.createElement('span')
@@ -149,12 +156,11 @@ class TokenTextArea
       node.contentEditable = false
       node.dataset.id = id
       node.innerHTML = name
-      range.insertNode(document.createTextNode(' '));
-      range.insertNode(node)
-      range.insertNode(document.createTextNode(' '));
+      @range.insertNode(node)
+      @range.insertNode(document.createTextNode(' '));
 
-      # Set selection range (i.e. caret position) to token.
-      range = range.cloneRange()
+      # Set selection range (i.e. caret position) to new token.
+      range = @range.cloneRange()
       range.setStartAfter(node)
       range.collapse(true)
       sel.removeAllRanges()
@@ -162,6 +168,7 @@ class TokenTextArea
 
     # Close menu and reset.
     @closeAutocomplete()
+    @range = null
     @word = null
     @resultList.html ''
     @checkEquation()
@@ -188,34 +195,24 @@ class TokenTextArea
           @element.addClass "invalid"
           @errorMsg.show()
 
-  existingNames: ->
-    @element.find(".token-text-area-results li")
-      .map (index, element) ->
-        $(element).html()
-      .get()
-      
-  existingIds: ->
-    @element.find(".token-text-area-results li")
-      .map (index, element) ->
-        $(element).attr("data-id")
-      .get()
-
   isArrow: (code) ->
     $.inArray(code, [37, 38, 39, 40]) != -1
 
-  getCaretPos: ->
+  getRange: ->
     if window.getSelection and window.getSelection().rangeCount > 0
       range = window.getSelection().getRangeAt(0).cloneRange()
     else
       range = document.selection.createRange()
     range.collapse(true)
-    range.setStart(@element[0], 0)
-    range.toString().length
+    range
 
   getSelection: ->
-    caretPos = @getCaretPos()
+    # Determine the length of text in the input.
+    range = @getRange()
+    range.setStart(@element[0], 0)
+    caretPos = range.toString().length
 
-    # Remove each token in range and remove them from the caret position.
+    # Remove each token in range and deduct them from the caret position.
     # Otherwise, autocomplete suggestions will include existing tokens.
     html = $('<p>' + @input.html() + '</p>')
 
