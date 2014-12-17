@@ -26,7 +26,7 @@ class TokenTextArea
     @fixWhitespace()
 
     # Create and store error message box, initialized to valid.
-    @element.after('<div style="padding-left: 80px; margin-top: 10px; font-size: 12px; line-height: 16px;"></div>')
+    @element.after('<div style="margin-top: 5px; font-size: 12px; line-height: 16px;"></div>')
     @msg = @element.next()
     @showSuccess()
 
