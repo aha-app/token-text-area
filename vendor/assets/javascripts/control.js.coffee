@@ -211,9 +211,6 @@ class TokenTextArea
     return false
 
   checkEquation: ->
-    # Remove any newlines they may have pasted in.
-    @input.html(@input.html().replace(/(<br>|\n)/g, ''))
-
     # Remove any other elements they may have pasted in.
     @input.children(':not(.token)').each ->
       $(this).replaceWith($(this).html())
