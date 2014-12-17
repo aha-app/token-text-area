@@ -3,29 +3,44 @@ class TokenTextArea
   ID_REGEX: /data-id="[0-9]+"/i
   WORD_REGEX: /[a-z]+$/i
 
+  SUCCESS_COLOR: '#64b80b;'
+  ERROR_COLOR: '#b94a48;'
+  NEUTRAL_COLOR: '#E0E0E0;'
+
+  SUCCESS_MSG: 'Valid equation'
+  ERROR_MSG: 'Syntax error in equation'
+  CHECKING_MSG: 'Checking equation...'
+
   constructor: (@element, @options = {}) ->
     # Remove outline and return if readonly (display) mode.
     if @element.data("readonly") is true
       @element.addClass "noborder"
       return
 
+    # Find input, set editable, don't allow tokens to be edited.
     @input = @element.find(".token-text-area-input")
-
     @input.attr "contenteditable", "true"
     @input.find(".token").attr("contenteditable", "false")
 
-    @element.after('<div style="color: #b94a48; padding-left: 80px; margin-top: 10px; font-size: 12px; line-height: 16px;">Syntax error in formula.</div>')
-    @errorMsg = @element.next()
-    @errorMsg.hide()
+    # Ensure whitespace is correct.
+    @fixWhitespace()
 
+    # Create and store error message box, initialized to valid.
+    @element.after('<div style="padding-left: 80px; margin-top: 10px; font-size: 12px; line-height: 16px;"></div>')
+    @msg = @element.next()
+    @showSuccess()
+
+    # Create instance variables.
     @typingTimer = null
     @resultMenu = null
     @resultList = null
     @word = null
     @range = null
 
+    # Create the result menu.
     @createResultMenu()
 
+    # Bind all handlers.
     @registerEvents()
 
   registerEvents: ->
@@ -41,10 +56,7 @@ class TokenTextArea
 
       # Re-check validity of equation unless event is an arrow key.
       unless @isArrow(event.which)
-        @element.removeClass "valid"
-        @element.removeClass "invalid"
-        @element.addClass "maybevalid"
-        @errorMsg.hide()
+        @showChecking()
 
         clearTimeout(@typingTimer) unless @typingTimer is null
         @typingTimer = setTimeout( =>
@@ -188,7 +200,6 @@ class TokenTextArea
     node.contentEditable = false
     node.dataset.id = id
     node.innerHTML = name
-    @range.insertNode(document.createTextNode('\u00A0')) # Add a nbsp; at the end.
     @range.insertNode(node)
 
     # Set selection range (i.e. caret position) to new token.
@@ -219,21 +230,12 @@ class TokenTextArea
     if @options.onChange
       @options.onChange equation, (results) =>
         if results.valid
-          @element.removeClass "maybevalid"
-          @element.removeClass "invalid"
-          @element.addClass "valid"
-          @errorMsg.hide()
+          @showSuccess()
         else
-          @element.removeClass "maybevalid"
-          @element.removeClass "valid"
-          @element.addClass "invalid"
-          @errorMsg.show()
+          @showError()
 
   isArrow: (code) ->
     $.inArray(code, [37, 38, 39, 40]) != -1
-
-  stripNbsp: (string) ->
-    string.replace(/&nbsp;/g, ' ')
 
   getRange: ->
     # Return currently selected range.
@@ -262,6 +264,36 @@ class TokenTextArea
       html.empty().append(newContents)
 
     html.text().substr(0, caretPos)
+
+  stripNbsp: (string) ->
+    string.replace(/&nbsp;/g, '')
+
+  fixWhitespace: ->
+    html = @stripNbsp(@input.html())
+    html = html.replace(/&nbsp;/g, ' ')
+    html = html.replace(/[\s]+/g, ' ')
+    @input.html(html)
+
+  showSuccess: ->
+    @element.removeClass "invalid"
+    @element.removeClass "maybevalid"
+    @element.addClass "valid"
+    @msg.html(@SUCCESS_MSG)
+    @msg.css('color', @SUCCESS_COLOR)
+
+  showError: ->
+    @element.removeClass "valid"
+    @element.removeClass "maybevalid"
+    @element.addClass "invalid"
+    @msg.html(@ERROR_MSG)
+    @msg.css('color', @ERROR_COLOR)
+
+  showChecking: ->
+    @element.removeClass "valid"
+    @element.removeClass "invalid"
+    @element.addClass "maybevalid"
+    @msg.html(@CHECKING_MSG)
+    @msg.css('color', @NEUTRAL_COLOR)
       
 $.fn.tokenTextArea = (options, args...) ->
   @each ->
