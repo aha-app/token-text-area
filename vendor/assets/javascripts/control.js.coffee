@@ -186,7 +186,7 @@ class TokenTextArea
     node = document.createElement('span')
     node.className = 'token'
     node.contentEditable = false
-    node.dataset.id = id
+    node.setAttribute('data-id', id)
     node.innerHTML = name
     @range.insertNode(node)
 
