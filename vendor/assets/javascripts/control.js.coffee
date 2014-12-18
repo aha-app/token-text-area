@@ -1,6 +1,4 @@
 class TokenTextArea
-  TOKEN_REGEX: /<span class="token" (contenteditable="false" data-id="[0-9]+"|data-id="[0-9]+" contenteditable="false")>[^<]+<\/span>/i
-  ID_REGEX: /data-id="[0-9]+"/i
   WORD_REGEX: /[a-z]+$/i
 
   SUCCESS_COLOR: '#64b80b;'
@@ -219,10 +217,12 @@ class TokenTextArea
 
     # Replace tokens with #id#.
     equation = @fixHtmlTags(@input.html())
-    while (token = equation.match(@TOKEN_REGEX)) != null
-      idReg = token[0].match(@ID_REGEX)
-      id = idReg[0].replace('data-id="', '').replace('"', '')
-      equation = equation.replace(@TOKEN_REGEX, ' #' + id + '# ')
+
+    # Turn equation into jQuery object and replace each token with its data-id.
+    equation = $('<p>' + equation + '</p>')
+    equation.children('.token').each ->
+      $(this).replaceWith('#' + $(this).data('id') + '#')
+    equation = equation.text()
     
     # Check with server to find if expression is valid.
     if @options.onChange
