@@ -212,6 +212,7 @@ class TokenTextArea
     # Remove any other elements they may have pasted in.
     @input.children(':not(.token)').each ->
       $(this).replaceWith($(this).html())
+    @input.find('br').remove()
 
     # Replace tokens with #id#.
     equation = @fixHtmlTags(@input.html())
