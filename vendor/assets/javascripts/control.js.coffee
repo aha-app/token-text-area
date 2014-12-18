@@ -10,10 +10,11 @@ class TokenTextArea
   CHECKING_MSG: 'Checking equation...'
 
   constructor: (@element, @options = {}) ->
-    # Remove outline and return if readonly (display) mode.
-    if @element.data("readonly") is true
-      @element.addClass "noborder"
-      return
+    # Return if readonly (display) mode.
+    return if @element.data("readonly") is true
+
+    # Remove noborder class so highlighting works correctly.
+    @element.removeClass("noborder")      
 
     # Find input, set editable, don't allow tokens to be edited.
     @input = @element.find(".token-text-area-input")

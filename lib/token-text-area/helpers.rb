@@ -9,7 +9,7 @@ module TokenTextArea
       data_options = options[:data] || {}
       data_options.merge!({readonly: readonly})
       tag_options = html_options.merge(
-        class: "token-text-area valid #{html_options[:class]}",
+        class: "token-text-area noborder #{html_options[:class]}",
         data: data_options
       )
       
