@@ -31,11 +31,11 @@ class TokenTextArea
     @showSuccess()
 
     # Create instance variables.
-    @typingTimer = null
     @resultMenu = null
     @resultList = null
     @word = null
     @range = null
+    @typingTimer = null
 
     # Create the result menu.
     @createResultMenu()
@@ -44,27 +44,26 @@ class TokenTextArea
     @registerEvents()
 
   registerEvents: ->
-    @input.on "keyup paste input", (event) =>
-      # Store selected range (used to recover position when autocomplete menu is clicked).
-      @range = @getRange()
+    @input.on "keyup", =>
 
-      # Open autocomplete menu if the user has typed letters.
-      @checkAutocomplete()
+      clearTimeout(@typingTimer) unless @typingTimer is null
+      @typingTimer = setTimeout( =>
+        # Store selected range (used to recover position when autocomplete menu is clicked).
+        @range = @getRange()
 
-      # Spans lose contenteditable attr when pasted. (!?)
-      @input.find(".token").attr("contenteditable", "false")
+        # Open autocomplete menu if the user has typed letters.
+        @checkAutocomplete()
 
-      # Re-check validity of equation unless event is an arrow key.
-      unless @isArrow(event.which)
-        @showChecking()
+        # Spans lose contenteditable attr when pasted. (!?)
+        @input.find(".token").attr("contenteditable", "false")
 
-        clearTimeout(@typingTimer) unless @typingTimer is null
-        @typingTimer = setTimeout( =>
-          @checkEquation()
-        , 100)
+        # Re-check validity of equation.
+        @checkEquation()
+      , 250)
 
     @input.on "keydown", (event) =>
       clearTimeout(@typingTimer) unless @typingTimer is null
+      @showChecking() unless @isArrow(event.which)
 
       switch event.which
         when 13 # Enter
