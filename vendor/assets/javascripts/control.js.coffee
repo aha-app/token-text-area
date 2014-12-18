@@ -25,6 +25,9 @@ class TokenTextArea
     # Ensure whitespace is correct.
     @fixWhitespace()
 
+    # Ensure there's a space so the caret works at the end of input.
+    @input.append('&nbsp;') unless @input.html().substr(-6) == '&nbsp;'
+
     # Create and store error message box, initialized to valid.
     @element.after('<div style="margin-top: 5px; font-size: 12px; line-height: 16px;"></div>')
     @msg = @element.next()
@@ -83,17 +86,6 @@ class TokenTextArea
             @kill(event)
             @selectNextResult(-1)
 
-    @element.on "click", (event) =>
-      # Ensure there is at least one space in editor, so the caret blinks as user expects.
-      unless @input.text().trim().length > 0
-        sel = window.getSelection()
-        @input.append('&nbsp;')
-        range = document.createRange()
-        range.setStart(@input[0], 0)
-        range.setEnd(@input[0], 0)
-        sel.removeAllRanges()
-        sel.addRange(range)
-
     @input.on "click", (event) =>
       # When the user clicks into the editor, check if they have clicked on a partial token to be completed.
       @checkAutocomplete()
@@ -133,7 +125,9 @@ class TokenTextArea
         # Re-select previously selected suggestion.
         $("li[data-id=" + selected.attr("data-id") + "]").addClass("selected") unless selected is null
 
+        # Position result menu.
         @resultMenu.css('left', $(".token-text-area-input").position().left)
+        @resultMenu.css('top', $(".token-text-area-input").position().top + $(".token-text-area-input").height() + 12)
 
         # Display suggestions and bind click event if we have focus.
         if $(@input).is(":focus") and @resultList.find("li").length > 0
@@ -201,6 +195,9 @@ class TokenTextArea
     range.collapse(true)
     sel.removeAllRanges()
     sel.addRange(range)
+
+    # Ensure there's a space so the caret works at the end of input.
+    @input.append('&nbsp;') unless @input.html().substr(-6) == '&nbsp;'
 
     # Close menu and reset.
     @closeAutocomplete()
