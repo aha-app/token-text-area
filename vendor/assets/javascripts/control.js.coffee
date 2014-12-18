@@ -133,6 +133,8 @@ class TokenTextArea
         # Re-select previously selected suggestion.
         $("li[data-id=" + selected.attr("data-id") + "]").addClass("selected") unless selected is null
 
+        @resultMenu.css('left', $(".token-text-area-input").position().left)
+
         # Display suggestions and bind click event if we have focus.
         if $(@input).is(":focus") and @resultList.find("li").length > 0
           @resultMenu.css("display", "inline-block")
