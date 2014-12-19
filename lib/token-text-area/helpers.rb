@@ -17,7 +17,9 @@ module TokenTextArea
       
       content_tag(container_tag, tag_options) do
         content_tag(:div, class: 'token-text-area-input') do
-          unless equation.nil?
+          if equation.nil?
+            ''
+          else
             equation.gsub!(/#[0-9]+#/) do 
               cur_match = Regexp.last_match.to_s
               metric = metrics.detect{ |m| m[:id] == cur_match.gsub('#','').to_i }

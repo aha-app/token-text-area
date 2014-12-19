@@ -10,11 +10,18 @@ class TokenTextArea
   CHECKING_MSG: 'Checking equation...'
 
   constructor: (@element, @options = {}) ->
+    @initialize()
+
+    @update = ->
+      @initialize()
+      console.log 'ok'
+
+  initialize: ->
     # Return if readonly (display) mode.
     return if @element.data("readonly") is true
 
     # Remove noborder class so highlighting works correctly.
-    @element.removeClass("noborder")      
+    @element.removeClass("noborder")
 
     # Find input, set editable, don't allow tokens to be edited.
     @input = @element.find(".token-text-area-input")
@@ -28,7 +35,8 @@ class TokenTextArea
     @input.append('&nbsp;') unless @input.html().substr(-6) == '&nbsp;'
 
     # Create and store error message box, initialized to valid.
-    @element.after('<div style="margin-top: 5px; font-size: 12px; line-height: 16px;"></div>')
+    unless @element.next().hasClass("token-text-area-msg")
+      @element.after('<div style="margin-top: 5px; font-size: 12px; line-height: 16px;" class="token-text-area-msg"></div>')
     @msg = @element.next()
     @showSuccess()
 
@@ -40,7 +48,7 @@ class TokenTextArea
     @typingTimer = null
 
     # Create the result menu.
-    @createResultMenu()
+    @createResultMenu() unless $(".token-text-area-menu")
 
     # Bind all handlers.
     @registerEvents()
@@ -303,6 +311,9 @@ $.fn.tokenTextArea = (options, args...) ->
 
     if !data
       $this.data 'plugin_tokenTextArea', (data = new TokenTextArea( $this, options))
+    else
+      $this.data('plugin_tokenTextArea').update()
+    
     if typeof options is 'string'
       data[options].apply(data, args)
 
