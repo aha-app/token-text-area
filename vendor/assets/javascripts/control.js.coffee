@@ -14,7 +14,6 @@ class TokenTextArea
 
     @update = ->
       @initialize()
-      console.log 'ok'
 
   initialize: ->
     # Return if readonly (display) mode.
@@ -35,9 +34,8 @@ class TokenTextArea
     @input.append('&nbsp;') unless @input.html().substr(-6) == '&nbsp;'
 
     # Create and store error message box, initialized to valid.
-    unless @element.next().hasClass("token-text-area-msg")
-      @element.after('<div style="margin-top: 5px; font-size: 12px; line-height: 16px;" class="token-text-area-msg"></div>')
-    @msg = @element.next()
+    @msg = $('<div style="margin-top: 5px; font-size: 12px; line-height: 16px;" class="token-text-area-msg"></div>')
+    @element.after @msg
     @showSuccess()
 
     # Create instance variables.
@@ -48,7 +46,7 @@ class TokenTextArea
     @typingTimer = null
 
     # Create the result menu.
-    @createResultMenu() unless $(".token-text-area-menu")
+    @createResultMenu()
 
     # Bind all handlers.
     @registerEvents()
@@ -155,8 +153,11 @@ class TokenTextArea
     @resultMenu.hide()
 
   createResultMenu: ->
-    @resultMenu = $("<div class='token-text-area-menu'><ul class='token-text-area-results'></ul></div")
-    @element.append @resultMenu
+    if $(".token-text-area-menu")
+      @resultMenu = @element.find(".token-text-area-menu")
+    else
+      @resultMenu = $("<div class='token-text-area-menu'><ul class='token-text-area-results'></ul></div")
+      @element.append @resultMenu
     @resultList = @resultMenu.find "ul"
 
   selectNextResult: (offset) ->
@@ -284,6 +285,7 @@ class TokenTextArea
     @input.html(html)
 
   showSuccess: ->
+    console.log @msg
     @element.removeClass "invalid"
     @element.removeClass "maybevalid"
     @element.addClass "valid"
