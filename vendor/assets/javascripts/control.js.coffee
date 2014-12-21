@@ -147,11 +147,8 @@ class TokenTextArea
     @resultMenu.hide()
 
   createResultMenu: ->
-    if $(".token-text-area-menu")
-      @resultMenu = @element.find(".token-text-area-menu")
-    else
-      @resultMenu = $("<div class='token-text-area-menu'><ul class='token-text-area-results'></ul></div")
-      @element.append @resultMenu
+    @resultMenu = $("<div class='token-text-area-menu'><ul class='token-text-area-results'></ul></div")
+    @element.append @resultMenu
     @resultList = @resultMenu.find "ul"
 
   selectNextResult: (offset) ->
@@ -230,8 +227,8 @@ class TokenTextArea
     
     # Check with server to find if expression is valid.
     if @options.onChange
-      @options.onChange equation, (results) =>
-        if results.valid
+      @options.onChange equation, (valid) =>
+        if valid
           @showSuccess()
         else
           @showError()
