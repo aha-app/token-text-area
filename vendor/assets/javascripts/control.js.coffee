@@ -4,12 +4,20 @@ class TokenTextArea
   SUCCESS_COLOR: '#64b80b;'
   ERROR_COLOR: '#b94a48;'
   NEUTRAL_COLOR: '#E0E0E0;'
+  BLACK_COLOR: '#000000;'
 
   SUCCESS_MSG: 'Valid equation'
   ERROR_MSG: 'Syntax error in equation'
   CHECKING_MSG: 'Checking equation...'
 
   constructor: (@element, @options = {}) ->
+    @initialize()
+
+    @update = ->
+      $(".help-block").css('color', @BLACK_COLOR)
+      @initialize()
+
+  initialize: ->
     # Return if readonly (display) mode.
     return if @element.data("readonly") is true
 
@@ -303,6 +311,8 @@ $.fn.tokenTextArea = (options, args...) ->
 
     if !data
       $this.data 'plugin_tokenTextArea', (data = new TokenTextArea( $this, options))
+    else
+      $this.data('plugin_tokenTextArea').update()
     
     if typeof options is 'string'
       data[options].apply(data, args)
