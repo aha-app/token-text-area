@@ -10,12 +10,6 @@ class TokenTextArea
   CHECKING_MSG: 'Checking equation...'
 
   constructor: (@element, @options = {}) ->
-    @initialize()
-
-    @update = ->
-      @initialize()
-
-  initialize: ->
     # Return if readonly (display) mode.
     return if @element.data("readonly") is true
 
@@ -285,7 +279,6 @@ class TokenTextArea
     @input.html(html)
 
   showSuccess: ->
-    console.log @msg
     @element.removeClass "invalid"
     @element.removeClass "maybevalid"
     @element.addClass "valid"
@@ -313,8 +306,6 @@ $.fn.tokenTextArea = (options, args...) ->
 
     if !data
       $this.data 'plugin_tokenTextArea', (data = new TokenTextArea( $this, options))
-    else
-      $this.data('plugin_tokenTextArea').update()
     
     if typeof options is 'string'
       data[options].apply(data, args)
