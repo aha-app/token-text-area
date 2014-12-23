@@ -25,7 +25,8 @@ module TokenTextArea
               metric = metrics.detect{ |m| m[:id] == cur_match.gsub('#','').to_i }
               content_tag(:span, class: 'token', data: { id: metric[:id] }) do
                 label = metric[:name]
-                label += "&nbsp;<b>#{values.detect{ |v| v[:metric_id] == metric[:id] }[:value].to_s}</b>" if values
+                value = values.detect{ |v| v[:metric_id] == metric[:id] } if values
+                label += "&nbsp;<b>#{value[:value].to_s}</b>" if values && value
                 label.html_safe
               end
             end
