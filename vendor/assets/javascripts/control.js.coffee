@@ -28,11 +28,6 @@ class TokenTextArea
     # Ensure there's a space so the caret works at the end of input.
     @input.append('&nbsp;') unless @input.html().substr(-6) == '&nbsp;'
 
-    # Create and store error message box, initialized to valid.
-    @msg = $('<div style="margin-top: 5px; font-size: 12px; line-height: 16px;" class="token-text-area-msg"></div>')
-    @element.after @msg
-    @showSuccess()
-
     # Create instance variables.
     @resultMenu = null
     @resultList = null
@@ -40,11 +35,23 @@ class TokenTextArea
     @range = null
     @typingTimer = null
 
+    # Create the equation message box.
+    @createMsg()
+
     # Create the result menu.
     @createResultMenu()
 
     # Bind all handlers.
     @registerEvents()
+
+    # Initially show success.
+    @showSuccess()
+
+    # Function to handle reactive updates.
+    @update = ->
+      @createMsg()
+      @createResultMenu()
+      @checkEquation()
 
   registerEvents: ->
     @input.on "keyup", =>
@@ -152,6 +159,11 @@ class TokenTextArea
     @element.append @resultMenu
     @resultList = @resultMenu.find "ul"
 
+  createMsg: ->
+    # Create and store error message box, initialized to valid.
+    @msg = $('<div style="margin-top: 5px; font-size: 12px; line-height: 16px;" class="token-text-area-msg"></div>')
+    @element.after @msg
+
   selectNextResult: (offset) ->
     items = @resultList.find("li")
     currentIndex = items.index(items.filter(".selected"))
@@ -229,6 +241,7 @@ class TokenTextArea
     # Check with server to find if expression is valid.
     if @options.onChange
       @options.onChange equation, (valid) =>
+        @element.removeClass("noborder")
         if valid
           @showSuccess()
         else
