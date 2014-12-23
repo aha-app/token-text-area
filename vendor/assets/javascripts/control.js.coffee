@@ -11,13 +11,6 @@ class TokenTextArea
   CHECKING_MSG: 'Checking equation...'
 
   constructor: (@element, @options = {}) ->
-    @initialize()
-
-    @update = ->
-      $(".help-block").css('color', @BLACK_COLOR)
-      @initialize()
-
-  initialize: ->
     # Return if readonly (display) mode.
     return if @element.data("readonly") is true
 
@@ -309,10 +302,7 @@ $.fn.tokenTextArea = (options, args...) ->
     $this = $(this)
     data = $this.data('plugin_tokenTextArea')
 
-    if !data
-      $this.data 'plugin_tokenTextArea', (data = new TokenTextArea( $this, options))
-    else
-      $this.data('plugin_tokenTextArea').update()
+    $this.data('plugin_tokenTextArea', (data = new TokenTextArea( $this, options))) unless data
     
     if typeof options is 'string'
       data[options].apply(data, args)
