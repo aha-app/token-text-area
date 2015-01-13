@@ -3,6 +3,8 @@
 Javascript control for editing equations that supports embedded tokens for
 variables in the equations.
 
+We created this control to support [editing feature scoring equations](http://support.aha.io/hc/en-us/articles/202949949-Using-advanced-Scorecard-formulas) in [Aha!](http://www.aha.io/). It allows users to mix arbitrary mathematical equations with user defined variables.
+
 ## Screenshots
 
 ![Example Equation](https://cloud.githubusercontent.com/assets/1896112/5730563/c08ae4d6-9b40-11e4-8d48-02357ed1c484.png)
