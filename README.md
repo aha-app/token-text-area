@@ -3,6 +3,11 @@
 Javascript control for editing equations that supports embedded tokens for
 variables in the equations.
 
+## Screenshots
+
+![Example Equation](https://cloud.githubusercontent.com/assets/1896112/5730563/c08ae4d6-9b40-11e4-8d48-02357ed1c484.png)
+![Example Equation](https://cloud.githubusercontent.com/assets/1896112/5730571/e52ed50e-9b40-11e4-9bbc-e4c034fbd549.png)
+
 ## Usage
 
 ### Installation
