@@ -26,9 +26,6 @@ class TokenTextArea
     @range = null
     @typingTimer = null
 
-    # Create the equation message box.
-    @createMsg()
-
     # Create the result menu.
     @createResultMenu()
 
@@ -37,9 +34,8 @@ class TokenTextArea
 
     # Function to handle reactive updates.
     @update = ->
-      @createMsg()
       @createResultMenu()
-      @checkEquation()
+      @saveEquation()
 
   registerEvents: ->
     @input.on "keyup", =>
@@ -58,8 +54,8 @@ class TokenTextArea
         # Make sure input is never empty, otherwise user can't focus any more.
         @input.append('&nbsp;') if @input.text().trim().length is 0
       
-        # Re-check validity of equation.
-        @checkEquation()
+        # Save equation.
+        @saveEquation()
       , 250)
 
     @input.on "keydown", (event) =>
@@ -204,11 +200,11 @@ class TokenTextArea
     @range = null
     @word = null
     @resultList.html ''
-    @checkEquation()
+    @saveEquation()
 
     return false
 
-  checkEquation: ->
+  saveEquation: ->
     # Remove any other elements they may have pasted in.
     @input.children(':not(.token)').each ->
       $(this).replaceWith($(this).html())
@@ -225,9 +221,6 @@ class TokenTextArea
     
     # Check with server to find if expression is valid.
     @options.onChange(equation) if @options.onChange
-
-  isArrow: (code) ->
-    $.inArray(code, [37, 38, 39, 40]) != -1
 
   getRange: ->
     # Return currently selected range.
