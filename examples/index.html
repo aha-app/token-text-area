@@ -20,15 +20,13 @@
 </head>
 
 <body>
-  
-  <div class="token-text-area-dummy" contenteditable="true">
-    (<span class="token">Customer value</span> + <span class="token">Technical value</span> + <span class="token">Business value</span>) / <span class="token">Effort</span>
-  </div>
-  
-  <br/>
-  
-  <div id="ta" class="token-text-area" data-autocomplete='[["Pizzazz","456"],["Wow","789"]]'>
-    (<input class="token" data-id="123" type="button" value="Customer value" />+<input class="token" data-id="456" type="button" value="Technical value" />+<input class="token" data-id="789" type="button" value="Business value" />)/<input class="token" data-id="012" type="button" value="Effort" />
+  <div class="token-text-area" data-readonly="false">
+    <div class="token-text-area-input" contenteditable="true">
+      (<span class="token" contenteditable="false" data-id="1">Customer Value</span>+ <span class="token" contenteditable="false" data-id="2">Technical Value</span>+ <span class="token" contenteditable="false" data-id="3">Business Value</span>) / <span class="token" contenteditable="false" data-id="4">Effort</span>&nbsp;
+    </div>
+    <div class="token-text-area-menu" style="display: none; left: 559px; top: 244px;">
+      <ul class="token-text-area-results"></ul>
+    </div>
   </div>
   
   <script>
