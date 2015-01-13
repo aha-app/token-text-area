@@ -1,15 +1,6 @@
 class TokenTextArea
   WORD_REGEX: /[a-z]+$/i
 
-  SUCCESS_COLOR: '#64b80b;'
-  ERROR_COLOR: '#b94a48;'
-  NEUTRAL_COLOR: '#E0E0E0;'
-  BLACK_COLOR: '#000000;'
-
-  SUCCESS_MSG: 'Valid equation'
-  ERROR_MSG: 'Syntax error in equation'
-  CHECKING_MSG: 'Checking equation...'
-
   constructor: (@element, @options = {}) ->
     # Return if readonly (display) mode.
     return if @element.data("readonly") is true
@@ -35,23 +26,16 @@ class TokenTextArea
     @range = null
     @typingTimer = null
 
-    # Create the equation message box.
-    @createMsg()
-
     # Create the result menu.
     @createResultMenu()
 
     # Bind all handlers.
     @registerEvents()
 
-    # Initially show success.
-    @showSuccess()
-
     # Function to handle reactive updates.
     @update = ->
-      @createMsg()
       @createResultMenu()
-      @checkEquation()
+      @saveEquation()
 
   registerEvents: ->
     @input.on "keyup", =>
@@ -70,13 +54,12 @@ class TokenTextArea
         # Make sure input is never empty, otherwise user can't focus any more.
         @input.append('&nbsp;') if @input.text().trim().length is 0
       
-        # Re-check validity of equation.
-        @checkEquation()
+        # Save equation.
+        @saveEquation()
       , 250)
 
     @input.on "keydown", (event) =>
       clearTimeout(@typingTimer) unless @typingTimer is null
-      @showChecking() unless @isArrow(event.which)
 
       switch event.which
         when 13 # Enter
@@ -162,11 +145,6 @@ class TokenTextArea
     @element.append @resultMenu
     @resultList = @resultMenu.find "ul"
 
-  createMsg: ->
-    # Create and store error message box, initialized to valid.
-    @msg = $('<div style="margin-top: 5px; font-size: 12px; line-height: 16px;" class="token-text-area-msg"></div>')
-    @element.after @msg
-
   selectNextResult: (offset) ->
     items = @resultList.find("li")
     currentIndex = items.index(items.filter(".selected"))
@@ -222,11 +200,11 @@ class TokenTextArea
     @range = null
     @word = null
     @resultList.html ''
-    @checkEquation()
+    @saveEquation()
 
     return false
 
-  checkEquation: ->
+  saveEquation: ->
     # Remove any other elements they may have pasted in.
     @input.children(':not(.token)').each ->
       $(this).replaceWith($(this).html())
@@ -242,16 +220,7 @@ class TokenTextArea
     equation = equation.text()
     
     # Check with server to find if expression is valid.
-    if @options.onChange
-      @options.onChange equation, (valid) =>
-        @element.removeClass("noborder")
-        if valid
-          @showSuccess()
-        else
-          @showError()
-
-  isArrow: (code) ->
-    $.inArray(code, [37, 38, 39, 40]) != -1
+    @options.onChange(equation) if @options.onChange
 
   getRange: ->
     # Return currently selected range.
@@ -291,27 +260,6 @@ class TokenTextArea
     html = html.replace(/&nbsp;/g, ' ')
     html = html.replace(/[\s]+/g, ' ')
     @input.html(html)
-
-  showSuccess: ->
-    @element.removeClass "invalid"
-    @element.removeClass "maybevalid"
-    @element.addClass "valid"
-    @msg.html(@SUCCESS_MSG)
-    @msg.css('color', @SUCCESS_COLOR)
-
-  showError: ->
-    @element.removeClass "valid"
-    @element.removeClass "maybevalid"
-    @element.addClass "invalid"
-    @msg.html(@ERROR_MSG)
-    @msg.css('color', @ERROR_COLOR)
-
-  showChecking: ->
-    @element.removeClass "valid"
-    @element.removeClass "invalid"
-    @element.addClass "maybevalid"
-    @msg.html(@CHECKING_MSG)
-    @msg.css('color', @NEUTRAL_COLOR)
       
 $.fn.tokenTextArea = (options, args...) ->
   @each ->
@@ -322,4 +270,3 @@ $.fn.tokenTextArea = (options, args...) ->
     
     if typeof options is 'string'
       data[options].apply(data, args)
-
