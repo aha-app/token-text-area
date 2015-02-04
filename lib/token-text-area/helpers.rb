@@ -23,10 +23,14 @@ module TokenTextArea
             equation.gsub!(/#[0-9]+#/) do 
               cur_match = Regexp.last_match.to_s
               variable = variables.detect{ |v| v[:id] == cur_match.gsub('#','').to_i }
-              content_tag(:span, class: 'token', data: { id: variable[:id] }) do
-                label = variable[:name]
-                label += "&nbsp;<b>#{variable[:value].to_s}</b>" if variable[:value]
-                label.html_safe
+              if variable
+                content_tag(:span, class: 'token', data: { id: variable[:id] }) do
+                  label = variable[:name]
+                  label += "&nbsp;<b>#{variable[:value].to_s}</b>" if variable[:value]
+                  label.html_safe
+                end
+              else
+                ""
               end
             end
             equation.html_safe
