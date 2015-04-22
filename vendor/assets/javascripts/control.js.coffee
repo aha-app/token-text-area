@@ -93,10 +93,9 @@ class TokenTextArea
         @closeAutocomplete() unless @resultMenu.is(":active")
       )
 
-    $(window).on "mousedown", (event) =>
-      if $(event.target).is(".token-text-area-menu li")
-        @addItem($(event.target))
-        @kill(event)
+    @element.on "mousedown", ".token-text-area-menu li", (event) =>
+      @addItem($(event.target))
+      @kill(event)
 
   kill: (event) ->
     event.stopPropagation()
