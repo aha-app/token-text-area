@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    token-text-area (1.0.9)
+    token-text-area (1.1.2)
       jquery-rails
       less-rails-bootstrap
       rails (~> 3.1)
@@ -60,7 +60,7 @@ GEM
     less-rails (2.6.0)
       actionpack (>= 3.1)
       less (~> 2.6.0)
-    less-rails-bootstrap (3.3.1.0)
+    less-rails-bootstrap (3.3.2.0)
       less-rails (~> 2.6.0)
     libv8 (3.16.14.7)
     mail (2.5.4)
@@ -108,7 +108,7 @@ GEM
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
-    tzinfo (0.3.42)
+    tzinfo (0.3.43)
 
 PLATFORMS
   ruby
