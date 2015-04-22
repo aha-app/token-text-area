@@ -128,10 +128,20 @@ class TokenTextArea
         # Display suggestions and bind click event if we have focus.
         if $(@input).is(":focus") and @resultList.find("li").length > 0
           @resultMenu.css("display", "inline-block")
-          @element.off "click", ".token-text-area-menu li"
-          @element.on "click", ".token-text-area-menu li", (event) =>
-            @addItem($(event.target))
-            @kill(event)
+
+          # Define handler for click event.
+          handler = (event) =>
+            if $(event.target).is(".token-text-area-menu li")
+              @addItem($(event.target))
+              @kill(event)
+
+          # Find existing event handlers that match this and unbind them.
+          if $._data(window, "events") && $._data(window, "events").click
+            for ev in $._data(window, "events").click when ev.handler == handler
+              $(window).off "mousedown", ev
+
+          # Rebind handler.
+          $(window).on "mousedown", handler
         else
           @resultMenu.hide()
 
