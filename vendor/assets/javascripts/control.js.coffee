@@ -50,9 +50,6 @@ class TokenTextArea
 
         # Spans lose contenteditable attr when pasted. (!?)
         @input.find(".token").attr("contenteditable", "false")
-
-        # Make sure input is never empty, otherwise user can't focus any more.
-        @input.append('&nbsp;') if @input.text().trim().length is 0
       
         # Save equation.
         @saveEquation()
@@ -82,9 +79,6 @@ class TokenTextArea
     @input.on "click", (event) =>
       # When the user clicks into the editor, check if they have clicked on a partial token to be completed.
       @checkAutocomplete()
-
-      # Append a space so the caret blinks, if the input is empty.
-      @input.append('&nbsp;') if @input.text().trim().length is 0
 
     @input.on "blur", (event) =>
       # When the user clicks out of the editor, wait a tick to get the active item- if they did not click on the
