@@ -1,0 +1,22 @@
+{
+  "name": "token-text-area",
+  "version": "1.1.4",
+  "description": "Text area with uneditable tokens for editing equations.",
+  "main": "vendor/assets/javascripts/token-text-area.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/k1w1/token-text-area.git"
+  },
+  "author": "Chris Waters <chris@aha.io>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/k1w1/token-text-area/issues"
+  },
+  "homepage": "https://github.com/k1w1/token-text-area#readme"
+}
