@@ -15,11 +15,4 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency 'rails'
-  s.add_dependency 'jquery-rails'
-  s.add_dependency 'less-rails-bootstrap'
-  s.add_development_dependency 'coffee-rails'
-  s.add_development_dependency 'sprockets'
-  s.add_development_dependency 'therubyracer'
-  
-  
 end
