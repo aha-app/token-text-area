@@ -1,0 +1,6 @@
+examples/
+lib/
+config.ru
+Gemfile
+Gemfile.lock
+token-text-area.gemspec
