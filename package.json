@@ -2,7 +2,7 @@
   "name": "token-text-area",
   "version": "1.1.4",
   "description": "Text area with uneditable tokens for editing equations.",
-  "main": "vendor/assets/javascripts/control.js.coffee",
+  "main": "vendor/assets/javascripts/token-text-area.coffee",
   "directories": {
     "example": "examples"
   },
@@ -18,5 +18,11 @@
   "bugs": {
     "url": "https://github.com/k1w1/token-text-area/issues"
   },
-  "homepage": "https://github.com/k1w1/token-text-area#readme"
+  "homepage": "https://github.com/k1w1/token-text-area#readme",
+  "dependencies": {
+    "css-loader": "^0.23.1",
+    "less": "^2.7.1",
+    "less-loader": "^2.2.3",
+    "style-loader": "^0.13.1"
+  }
 }
