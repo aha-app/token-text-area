@@ -151,6 +151,37 @@ class TokenTextArea
     else
       $(items[currentIndex]).addClass("selected")
 
+  # This is meant to be an external function used to add items to the DOM
+  # item is an object of the form:
+  # { id: 'xyz', name: 'the display name' }
+  pushItem: (item) ->
+    id = item.id
+    name = item.name
+    return unless id and name
+
+    # token = '<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>'
+    node = document.createElement('span')
+    node.className = 'token'
+    node.contentEditable = false
+    node.setAttribute('data-id', id)
+    node.innerHTML = name
+    @input.append(node)
+    @saveEquation()
+
+  removeItem: (id) ->
+    @input.find("[data-id='#{id}']").remove()
+    @saveEquation()
+
+  fillFromEquation: (equation, items) ->
+    html = equation.replace(/\#(\w+)\#/g, (dirtyId) ->
+      id = dirtyId.replace(/\#/g, '')
+      name = items.filter( (item) -> item.id == id )[0].name
+      return '<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>'
+    )
+    @input.html( html )
+    @saveEquation()
+
+
   addItem: (result) ->
     id = result.data('id')
     return unless id
