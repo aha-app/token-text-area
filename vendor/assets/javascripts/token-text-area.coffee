@@ -166,6 +166,7 @@ class TokenTextArea
     node.setAttribute('data-id', id)
     node.innerHTML = name
     @input.append(node)
+    @input.append('&nbsp;')
     @saveEquation()
 
   removeItem: (id) ->
@@ -176,7 +177,7 @@ class TokenTextArea
     html = equation.replace(/\#(\w+)\#/g, (dirtyId) ->
       id = dirtyId.replace(/\#/g, '')
       name = items.filter( (item) -> item.id == id )[0].name
-      return '<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>'
+      return '&nbsp;<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>&nbsp;'
     )
     @input.html( html )
     @saveEquation()
