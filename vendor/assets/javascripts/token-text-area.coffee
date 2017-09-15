@@ -176,7 +176,9 @@ class TokenTextArea
   fillFromEquation: (equation, items) ->
     html = equation.replace(/\#(\w+)\#/g, (dirtyId) ->
       id = dirtyId.replace(/\#/g, '')
-      name = items.filter( (item) -> item.id == id )[0].name
+      foundItem = items.filter( (item) -> item.id == id )[0]
+      return '' unless foundItem
+      name = foundItem.name
       return '&nbsp;<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>&nbsp;'
     )
     @input.html( html )
