@@ -1,5 +1,5 @@
 class TokenTextArea
-  WORD_REGEX: /[a-z]+$/i
+  WORD_REGEX: /[\s|\w]+$/i
 
   constructor: (@element, @options = {}) ->
     # Return if readonly (display) mode.
@@ -66,6 +66,14 @@ class TokenTextArea
           else if @resultList.find("li").length == 1
             @addItem(@resultList.find("li").first())
 
+        when 32 # Space
+          if @options.operators
+            @range = @getRange()
+            operator = @range.startContainer.data.trim() if @range.startContainer.data
+            if operator && @options.operators.includes(operator)
+              @word = [operator] #TODO: Make this not a hack
+              @addItem($('<span data-id='+operator+'>'+operator+'</span>'), true)
+
         when 40 # Down arrow
           if @resultList.find("li").length > 0
             @kill(event)
@@ -98,7 +106,7 @@ class TokenTextArea
   checkAutocomplete: ->
     # Open autocomplete menu if the user has typed letters.
     wordReg = @getWord().match @WORD_REGEX
-    if wordReg is null
+    if wordReg is null || wordReg[0].trim().length == 0
       @closeAutocomplete()
     else
       @word = wordReg
@@ -107,7 +115,7 @@ class TokenTextArea
   openAutocomplete: ->
     # Query server for autocomplete suggestions.
     if @options.onQuery
-      @options.onQuery @word[0], (results) =>
+      @options.onQuery @word[0].trim(), (results) =>
         # Save currently selected suggestion to re-higlight it.
         selected = @resultList.find(".selected")
         @closeAutocomplete()
@@ -181,11 +189,15 @@ class TokenTextArea
       name = foundItem.name
       return '&nbsp;<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>&nbsp;'
     )
+    if @options.operators
+      for op in @options.operators
+        html = html.split(op).join('&nbsp;<span contenteditable="false" class="operator">' + op + '</span>&nbsp;')
+
     @input.html( html )
     @saveEquation()
 
 
-  addItem: (result) ->
+  addItem: (result, operator=false) ->
     id = result.data('id')
     return unless id
 
@@ -193,7 +205,7 @@ class TokenTextArea
 
     # Create new token.
     name = tokenDisplayName || result.html()
-    token = '<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>'
+    # token = '<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>'
     
     # Re-place the caret in the editor (necessary if the user clicked on the autocomplete menu).
     sel = window.getSelection()
@@ -204,15 +216,22 @@ class TokenTextArea
     return unless sel.getRangeAt and sel.rangeCount
 
     # Set range to metric name fragment.
-    @range.setStart(@range.startContainer, @range.endOffset - @word[0].length)
+    @range.setStart(@range.startContainer, @range.endOffset - @word[0].trim().length)
     @range.deleteContents()
 
-    # Create and insert new token.
     node = document.createElement('span')
-    node.className = 'token'
-    node.contentEditable = false
-    node.setAttribute('data-id', id)
-    node.innerHTML = name
+    if operator
+      # Create and insert new token.
+      node.className = 'operator'
+      node.contentEditable = false
+      node.innerHTML = name
+    else
+      # Create and insert new token.
+      node.className = 'token'
+      node.contentEditable = false
+      node.setAttribute('data-id', id)
+      node.innerHTML = name
+
     @range.insertNode(node)
 
     # Set selection range (i.e. caret position) to new token.
@@ -236,7 +255,7 @@ class TokenTextArea
 
   saveEquation: ->
     # Remove any other elements they may have pasted in.
-    @input.children(':not(.token)').each ->
+    @input.children(':not(.token):not(.operator)').each ->
       $(this).replaceWith($(this).html())
     @input.find('br').remove()
 
@@ -247,6 +266,11 @@ class TokenTextArea
     equation = $('<p>' + equation + '</p>')
     equation.children('.token').each ->
       $(this).replaceWith('#' + $(this).data('id') + '#')
+
+    # if @options.operators
+    #   equation.children('.operator').each ->
+    #     $(this).replaceWith('@' + $(this).text() + '@')
+
     equation = equation.text()
     
     # Check with server to find if expression is valid.
@@ -271,8 +295,8 @@ class TokenTextArea
     # Otherwise, autocomplete suggestions will include existing tokens.
     html = $('<p>' + @input.html() + '</p>')
 
-    while html.find('.token').length > 0
-      token = $(html.find('.token').first())
+    while html.find('.token, .operator').length > 0
+      token = $(html.find('.token, .operator').first())
       break unless html.text().indexOf(token.text()) < caretPos
       caretPos -= token.text().length
       newContents = html.contents().not(token)
