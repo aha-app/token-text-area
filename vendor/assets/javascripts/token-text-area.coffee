@@ -191,7 +191,15 @@ class TokenTextArea
     )
     if @options.operators
       for op in @options.operators
-        html = html.split(op).join('&nbsp;<span contenteditable="false" class="operator">' + op + '</span>&nbsp;')
+        innerContent = op
+        # https://bugzilla.mozilla.org/show_bug.cgi?id=685445
+        # Eventually we shouldn't need this check anymore. This issue was fixed
+        # 3 weeks before this feature was deployed - but the updates haven't
+        # gone around yet
+        if navigator.userAgent.toLowerCase().indexOf('firefox') > -1
+          html = html.split(op).join('&nbsp;<span class="operator">' + op + '</span>&nbsp;')
+        else
+          html = html.split(op).join('&nbsp;<span contenteditable="false" class="operator">' + op + '</span>&nbsp;')
 
     @input.html( html )
     @saveEquation()
@@ -223,7 +231,8 @@ class TokenTextArea
     if operator
       # Create and insert new token.
       node.className = 'operator'
-      node.contentEditable = false
+      # see note on 196
+      node.contentEditable = false unless navigator.userAgent.toLowerCase().indexOf('firefox') > -1
       node.innerHTML = name
     else
       # Create and insert new token.
