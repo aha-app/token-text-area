@@ -114,7 +114,7 @@ class TokenTextArea
         
         # Populate results list.
         for result in results
-          @resultList.append("<li data-id='#{result.id}'>#{result.name}</li>")
+          @resultList.append("<li data-id='#{result.id}' data-token-display-name='#{result.tokenDisplayName}'>#{result.name}</li>")
 
         # Re-select previously selected suggestion.
         $("li[data-id=" + selected.attr("data-id") + "]").addClass("selected") unless selected is null
@@ -189,8 +189,10 @@ class TokenTextArea
     id = result.data('id')
     return unless id
 
+    tokenDisplayName = result.data('tokenDisplayName')
+
     # Create new token.
-    name = result.html()
+    name = tokenDisplayName || result.html()
     token = '<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>'
     
     # Re-place the caret in the editor (necessary if the user clicked on the autocomplete menu).
