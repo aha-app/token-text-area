@@ -175,7 +175,10 @@ class TokenTextArea
     node.className = 'token'
     node.contentEditable = false
     node.setAttribute('data-id', id)
-    node.innerHTML = name
+    if @options.removeButton
+      node.innerHTML = '<span class="remove-filter" data-id="'+id+'"><i class="fa fa-times" data-id="'+id+'"></i></span><span class="filter-name">' + name + '</span>'
+    else
+      node.innerHTML = name
     @input.append(node)
     @input.append('&nbsp;')
     @saveEquation()
@@ -184,13 +187,14 @@ class TokenTextArea
     @input.find("[data-id='#{id}']").remove()
     @saveEquation()
 
-  fillFromEquation: (equation, items, removeButton=false) ->
+  fillFromEquation: (equation, items) ->
+    self = @
     html = equation.replace(/\#(\w+)\#/g, (dirtyId) ->
       id = dirtyId.replace(/\#/g, '')
       foundItem = items.filter( (item) -> item.id == id )[0]
       return '' unless foundItem
       name = foundItem.name
-      if removeButton
+      if self.options.removeButton
         return '&nbsp;<span class="token" contenteditable="false" data-id="' + id + '"><span class="remove-filter" data-id="'+id+'"><i class="fa fa-times" data-id="'+id+'"></i></span><span class="filter-name">' + name + '</span></span>&nbsp;'
       else
         return '&nbsp;<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>&nbsp;'
