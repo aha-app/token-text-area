@@ -70,9 +70,9 @@ class TokenTextArea
           if @options.operators
             @range = @getRange()
             operator = @range.startContainer.data.trim() if @range.startContainer.data
-            if operator && @options.operators.includes(operator)
+            if operator && @options.operators.map((op) -> op.toLowerCase()).includes(operator.toLowerCase())
               @word = [operator] #TODO: Make this not a hack
-              @addItem($('<span data-id='+operator+'>'+operator+'</span>'), true)
+              @addItem($('<span data-id='+operator.toUpperCase()+'>'+operator.toUpperCase()+'</span>'), true)
 
         when 40 # Down arrow
           if @resultList.find("li").length > 0
