@@ -283,11 +283,13 @@ class TokenTextArea
       $(this).replaceWith('#' + $(this).data('id') + '#')
 
     if @options.operators
-      @range = @getRange()
-      operator = @range.startContainer.data.trim() if @range.startContainer.data
-      if operator && @options.operators.map((op) -> op.toLowerCase()).includes(operator.toLowerCase())
-        @word = [@range.startContainer.data] #TODO: Make this not a hack
-        @addItem($('<span data-id='+operator.toUpperCase()+'>'+operator.toUpperCase()+'</span>'), true)
+      try
+        @range = @getRange()
+        operator = @range.startContainer.data.trim() if @range.startContainer.data
+        if operator && @options.operators.map((op) -> op.toLowerCase()).includes(operator.toLowerCase())
+          @word = [@range.startContainer.data] #TODO: Make this not a hack
+          @addItem($('<span data-id='+operator.toUpperCase()+'>'+operator.toUpperCase()+'</span>'), true)
+
     # if @options.operators
     #   equation.children('.operator').each ->
     #     $(this).replaceWith('@' + $(this).text() + '@')
