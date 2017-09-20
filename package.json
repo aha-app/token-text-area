@@ -1,6 +1,6 @@
 {
   "name": "token-text-area",
-  "version": "1.1.4",
+  "version": "1.2.1",
   "description": "Text area with uneditable tokens for editing equations.",
   "main": "vendor/assets/javascripts/token-text-area.coffee",
   "directories": {

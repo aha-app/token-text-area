@@ -1,5 +1,5 @@
 class TokenTextArea
-  WORD_REGEX: /[a-z]+$/i
+  WORD_REGEX: /[\s|\w]+$/i
 
   constructor: (@element, @options = {}) ->
     # Return if readonly (display) mode.
@@ -66,6 +66,14 @@ class TokenTextArea
           else if @resultList.find("li").length == 1
             @addItem(@resultList.find("li").first())
 
+        when 32 # Space
+          if @options.operators
+            @range = @getRange()
+            operator = @range.startContainer.data.trim() if @range.startContainer.data
+            if operator && @options.operators.map((op) -> op.toLowerCase()).includes(operator.toLowerCase())
+              @word = [operator] #TODO: Make this not a hack
+              @addItem($('<span data-id='+operator.toUpperCase()+'>'+operator.toUpperCase()+'</span>'), true)
+
         when 40 # Down arrow
           if @resultList.find("li").length > 0
             @kill(event)
@@ -98,7 +106,7 @@ class TokenTextArea
   checkAutocomplete: ->
     # Open autocomplete menu if the user has typed letters.
     wordReg = @getWord().match @WORD_REGEX
-    if wordReg is null
+    if wordReg is null || wordReg[0].trim().length == 0
       @closeAutocomplete()
     else
       @word = wordReg
@@ -107,14 +115,17 @@ class TokenTextArea
   openAutocomplete: ->
     # Query server for autocomplete suggestions.
     if @options.onQuery
-      @options.onQuery @word[0], (results) =>
+      @options.onQuery @word[0].trim(), (results) =>
         # Save currently selected suggestion to re-higlight it.
         selected = @resultList.find(".selected")
         @closeAutocomplete()
         
         # Populate results list.
         for result in results
-          @resultList.append("<li data-id='#{result.id}'>#{result.name}</li>")
+          if result.tokenDisplayName
+            @resultList.append("<li data-id='#{result.id}' data-token-display-name='#{result.tokenDisplayName}'>#{result.name}</li>")
+          else
+            @resultList.append("<li data-id='#{result.id}'>#{result.name}</li>")
 
         # Re-select previously selected suggestion.
         $("li[data-id=" + selected.attr("data-id") + "]").addClass("selected") unless selected is null
@@ -151,13 +162,67 @@ class TokenTextArea
     else
       $(items[currentIndex]).addClass("selected")
 
-  addItem: (result) ->
+  # This is meant to be an external function used to add items to the DOM
+  # item is an object of the form:
+  # { id: 'xyz', name: 'the display name' }
+  pushItem: (item) ->
+    id = item.id
+    name = item.name
+    return unless id and name
+
+    # token = '<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>'
+    node = document.createElement('span')
+    node.className = 'token'
+    node.contentEditable = false
+    node.setAttribute('data-id', id)
+    if @options.removeButton
+      node.innerHTML = '<span class="filter-name">' + name + '</span><span class="remove-filter" data-id="'+id+'"><i class="fa fa-times" data-id="'+id+'"></i></span>'
+    else
+      node.innerHTML = name
+    @input.append(node)
+    @input.append('&nbsp;')
+    @saveEquation()
+
+  removeItem: (id) ->
+    @input.find("[data-id='#{id}']").remove()
+    @saveEquation()
+
+  fillFromEquation: (equation, items) ->
+    self = @
+    html = equation.replace(/\#(\w+)\#/g, (dirtyId) ->
+      id = dirtyId.replace(/\#/g, '')
+      foundItem = items.filter( (item) -> item.id == id )[0]
+      return '' unless foundItem
+      name = foundItem.name
+      if self.options.removeButton
+        return '&nbsp;<span class="token" contenteditable="false" data-id="' + id + '"><span class="filter-name">' + name + '</span><span class="remove-filter" data-id="'+id+'"><i class="fa fa-times" data-id="'+id+'"></i></span></span>&nbsp;'
+      else
+        return '&nbsp;<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>&nbsp;'
+    )
+    if @options.operators
+      for op in @options.operators
+        innerContent = op
+        # https://bugzilla.mozilla.org/show_bug.cgi?id=685445
+        # Eventually we shouldn't need this check anymore. This issue was fixed
+        # 3 weeks before this feature was deployed - but the updates haven't
+        # gone around yet
+        if navigator.userAgent.toLowerCase().indexOf('firefox') > -1
+          html = html.split(op).join('&nbsp;<span class="operator">' + op + '</span>&nbsp;')
+        else
+          html = html.split(op).join('&nbsp;<span contenteditable="false" class="operator">' + op + '</span>&nbsp;')
+
+    @input.html( html )
+    @saveEquation()
+
+
+  addItem: (result, operator=false) ->
     id = result.data('id')
     return unless id
 
-    # Create new token.
     name = result.html()
-    token = '<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>'
+    name = result.data('tokenDisplayName') if result.attr('data-token-display-name')
+
+    # token = '<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>'
     
     # Re-place the caret in the editor (necessary if the user clicked on the autocomplete menu).
     sel = window.getSelection()
@@ -168,15 +233,26 @@ class TokenTextArea
     return unless sel.getRangeAt and sel.rangeCount
 
     # Set range to metric name fragment.
-    @range.setStart(@range.startContainer, @range.endOffset - @word[0].length)
+    @range.setStart(@range.startContainer, @range.endOffset - @word[0].trim().length)
     @range.deleteContents()
 
-    # Create and insert new token.
     node = document.createElement('span')
-    node.className = 'token'
-    node.contentEditable = false
-    node.setAttribute('data-id', id)
-    node.innerHTML = name
+    if operator
+      # Create and insert new token.
+      node.className = 'operator'
+      # see note on 196
+      node.contentEditable = false unless navigator.userAgent.toLowerCase().indexOf('firefox') > -1
+      node.innerHTML = name
+    else
+      # Create and insert new token.
+      node.className = 'token'
+      node.contentEditable = false
+      node.setAttribute('data-id', id)
+      if @options.removeButton
+        node.innerHTML = '<span class="filter-name">' + name + '</span><span class="remove-filter" data-id="'+id+'"><i class="fa fa-times" data-id="'+id+'"></i></span>'
+      else
+        node.innerHTML = name
+
     @range.insertNode(node)
 
     # Set selection range (i.e. caret position) to new token.
@@ -200,7 +276,7 @@ class TokenTextArea
 
   saveEquation: ->
     # Remove any other elements they may have pasted in.
-    @input.children(':not(.token)').each ->
+    @input.children(':not(.token):not(.operator)').each ->
       $(this).replaceWith($(this).html())
     @input.find('br').remove()
 
@@ -211,7 +287,17 @@ class TokenTextArea
     equation = $('<p>' + equation + '</p>')
     equation.children('.token').each ->
       $(this).replaceWith('#' + $(this).data('id') + '#')
+
+    # if @options.operators
+    #   equation.children('.operator').each ->
+    #     $(this).replaceWith('@' + $(this).text() + '@')
+
     equation = equation.text()
+
+    self = @
+    $('.remove-filter').click( () ->
+      self.removeItem($(@).data('id'))
+    )
     
     # Check with server to find if expression is valid.
     @options.onChange(equation) if @options.onChange
@@ -235,8 +321,8 @@ class TokenTextArea
     # Otherwise, autocomplete suggestions will include existing tokens.
     html = $('<p>' + @input.html() + '</p>')
 
-    while html.find('.token').length > 0
-      token = $(html.find('.token').first())
+    while html.find('.token, .operator').length > 0
+      token = $(html.find('.token, .operator').first())
       break unless html.text().indexOf(token.text()) < caretPos
       caretPos -= token.text().length
       newContents = html.contents().not(token)
