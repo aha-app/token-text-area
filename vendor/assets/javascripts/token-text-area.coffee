@@ -176,7 +176,7 @@ class TokenTextArea
     node.contentEditable = false
     node.setAttribute('data-id', id)
     if @options.removeButton
-      node.innerHTML = '<span class="remove-filter" data-id="'+id+'"><i class="fa fa-times" data-id="'+id+'"></i></span><span class="filter-name">' + name + '</span>'
+      node.innerHTML = '<span class="filter-name">' + name + '</span><span class="remove-filter" data-id="'+id+'"><i class="fa fa-times" data-id="'+id+'"></i></span>'
     else
       node.innerHTML = name
     @input.append(node)
@@ -195,7 +195,7 @@ class TokenTextArea
       return '' unless foundItem
       name = foundItem.name
       if self.options.removeButton
-        return '&nbsp;<span class="token" contenteditable="false" data-id="' + id + '"><span class="remove-filter" data-id="'+id+'"><i class="fa fa-times" data-id="'+id+'"></i></span><span class="filter-name">' + name + '</span></span>&nbsp;'
+        return '&nbsp;<span class="token" contenteditable="false" data-id="' + id + '"><span class="filter-name">' + name + '</span><span class="remove-filter" data-id="'+id+'"><i class="fa fa-times" data-id="'+id+'"></i></span></span>&nbsp;'
       else
         return '&nbsp;<span class="token" contenteditable="false" data-id="' + id + '">' + name + '</span>&nbsp;'
     )
@@ -249,7 +249,7 @@ class TokenTextArea
       node.contentEditable = false
       node.setAttribute('data-id', id)
       if @options.removeButton
-        node.innerHTML = '<span class="remove-filter" data-id="'+id+'"><i class="fa fa-times" data-id="'+id+'"></i></span><span class="filter-name">' + name + '</span>'
+        node.innerHTML = '<span class="filter-name">' + name + '</span><span class="remove-filter" data-id="'+id+'"><i class="fa fa-times" data-id="'+id+'"></i></span>'
       else
         node.innerHTML = name
 
