@@ -66,14 +66,6 @@ class TokenTextArea
           else if @resultList.find("li").length == 1
             @addItem(@resultList.find("li").first())
 
-        when 32 # Space
-          if @options.operators
-            @range = @getRange()
-            operator = @range.startContainer.data.trim() if @range.startContainer.data
-            if operator && @options.operators.map((op) -> op.toLowerCase()).includes(operator.toLowerCase())
-              @word = [operator] #TODO: Make this not a hack
-              @addItem($('<span data-id='+operator.toUpperCase()+'>'+operator.toUpperCase()+'</span>'), true)
-
         when 40 # Down arrow
           if @resultList.find("li").length > 0
             @kill(event)
@@ -233,7 +225,9 @@ class TokenTextArea
     return unless sel.getRangeAt and sel.rangeCount
 
     # Set range to metric name fragment.
-    @range.setStart(@range.startContainer, @range.endOffset - @word[0].trim().length)
+    offsetDiff = @range.endOffset - @word[0].length
+    offsetDiff = 0 if offsetDiff < 0
+    @range.setStart(@range.startContainer, offsetDiff)
     @range.deleteContents()
 
     node = document.createElement('span')
@@ -242,7 +236,7 @@ class TokenTextArea
       node.className = 'operator'
       # see note on 196
       node.contentEditable = false unless navigator.userAgent.toLowerCase().indexOf('firefox') > -1
-      node.innerHTML = name
+      node.innerHTML = '&nbsp;'+name+'&nbsp;'
     else
       # Create and insert new token.
       node.className = 'token'
@@ -288,6 +282,12 @@ class TokenTextArea
     equation.children('.token').each ->
       $(this).replaceWith('#' + $(this).data('id') + '#')
 
+    if @options.operators
+      @range = @getRange()
+      operator = @range.startContainer.data.trim() if @range.startContainer.data
+      if operator && @options.operators.map((op) -> op.toLowerCase()).includes(operator.toLowerCase())
+        @word = [@range.startContainer.data] #TODO: Make this not a hack
+        @addItem($('<span data-id='+operator.toUpperCase()+'>'+operator.toUpperCase()+'</span>'), true)
     # if @options.operators
     #   equation.children('.operator').each ->
     #     $(this).replaceWith('@' + $(this).text() + '@')
