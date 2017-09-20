@@ -246,6 +246,8 @@ class TokenTextArea
       node.setAttribute('data-id', id)
       if @options.removeButton
         node.innerHTML = '<span class="remove-filter" data-id="'+id+'"><i class="fa fa-times" data-id="'+id+'"></i></span><span class="filter-name">' + name + '</span>'
+      else
+        node.innerHTML = name
 
     @range.insertNode(node)
 
