@@ -116,7 +116,8 @@ class TokenTextArea
         # Populate results list.
 
         for result in results
-          boldedName = result.name.split(trimmedQuery).join("<b>#{trimmedQuery}</b>")
+          r = RegExp(trimmedQuery, 'i')
+          boldedName = result.name.split(r).join("<b>#{trimmedQuery}</b>")
           if result.tokenDisplayName
             @resultList.append("<li data-id='#{result.id}' data-token-display-name='#{result.tokenDisplayName}'>#{boldedName}</li>")
           else
