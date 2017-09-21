@@ -107,17 +107,20 @@ class TokenTextArea
   openAutocomplete: ->
     # Query server for autocomplete suggestions.
     if @options.onQuery
-      @options.onQuery @word[0].trim(), (results) =>
+      trimmedQuery = @word[0].trim()
+      @options.onQuery trimmedQuery, (results) =>
         # Save currently selected suggestion to re-higlight it.
         selected = @resultList.find(".selected")
         @closeAutocomplete()
         
         # Populate results list.
+
         for result in results
+          boldedName = result.name.split(trimmedQuery).join("<b>#{trimmedQuery}</b>")
           if result.tokenDisplayName
-            @resultList.append("<li data-id='#{result.id}' data-token-display-name='#{result.tokenDisplayName}'>#{result.name}</li>")
+            @resultList.append("<li data-id='#{result.id}' data-token-display-name='#{result.tokenDisplayName}'>#{boldedName}</li>")
           else
-            @resultList.append("<li data-id='#{result.id}'>#{result.name}</li>")
+            @resultList.append("<li data-id='#{result.id}'>#{boldedName}</li>")
 
         # Re-select previously selected suggestion.
         $("li[data-id=" + selected.attr("data-id") + "]").addClass("selected") unless selected is null
