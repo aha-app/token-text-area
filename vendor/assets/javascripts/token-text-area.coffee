@@ -66,6 +66,13 @@ class TokenTextArea
           else if @resultList.find("li").length == 1
             @addItem(@resultList.find("li").first())
 
+        when 8 # Backspace
+          if @options.operators
+            @range = @getRange()
+            parent = @range.commonAncestorContainer.parentElement
+            if parent.classList.contains('operator')
+              parent.parentNode.removeChild(parent)
+
         when 40 # Down arrow
           if @resultList.find("li").length > 0
             @kill(event)
@@ -299,7 +306,8 @@ class TokenTextArea
       try
         @range = @getRange()
         operator = @range.startContainer.data.trim() if @range.startContainer.data
-        if operator && @options.operators.map((op) -> op.toLowerCase()).includes(operator.toLowerCase())
+        operatorIsPicked = @range.commonAncestorContainer.parentElement.classList.contains('operator')
+        if operator && @options.operators.map((op) -> op.toLowerCase()).includes(operator.toLowerCase()) && !operatorIsPicked
           @word = [@range.startContainer.data] #TODO: Make this not a hack
           @addItem($('<span data-id='+operator.toUpperCase()+'>'+operator.toUpperCase()+'</span>'), true)
 
