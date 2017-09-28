@@ -243,7 +243,7 @@ class TokenTextArea
       node.className = 'operator'
       # see note on 196
       node.contentEditable = false unless navigator.userAgent.toLowerCase().indexOf('firefox') > -1
-      node.innerHTML = '&nbsp;'+name+'&nbsp;'
+      node.innerHTML = name
     else
       # Create and insert new token.
       node.className = 'token'
@@ -254,11 +254,21 @@ class TokenTextArea
       else
         node.innerHTML = name
 
-    @range.insertNode(node)
+    if operator
+      space1 = document.createTextNode('\u00A0')
+      space2 = document.createTextNode('\u00A0')
+      @range.insertNode(space1)
+      @range.insertNode(node)
+      @range.insertNode(space2)
+      # Set selection range (i.e. caret position) to new token.
+      range = @range.cloneRange()
+      range.setStartAfter(space1)
+    else
+      @range.insertNode(node)
+      # Set selection range (i.e. caret position) to new token.
+      range = @range.cloneRange()
+      range.setStartAfter(node)
 
-    # Set selection range (i.e. caret position) to new token.
-    range = @range.cloneRange()
-    range.setStartAfter(node)
     range.collapse(true)
     sel.removeAllRanges()
     sel.addRange(range)
@@ -281,14 +291,6 @@ class TokenTextArea
       $(this).replaceWith($(this).html())
     @input.find('br').remove()
 
-    # Replace tokens with #id#.
-    equation = @fixHtmlTags(@input.html())
-
-    # Turn equation into jQuery object and replace each token with its data-id.
-    equation = $('<p>' + equation + '</p>')
-    equation.children('.token').each ->
-      $(this).replaceWith('#' + $(this).data('id') + '#')
-
     if @options.removeButton
       self = this
       $(".token:not(:has(>.remove-filter))").each ->
@@ -300,6 +302,14 @@ class TokenTextArea
         if operator && @options.operators.map((op) -> op.toLowerCase()).includes(operator.toLowerCase())
           @word = [@range.startContainer.data] #TODO: Make this not a hack
           @addItem($('<span data-id='+operator.toUpperCase()+'>'+operator.toUpperCase()+'</span>'), true)
+
+    # Replace tokens with #id#.
+    equation = @fixHtmlTags(@input.html())
+
+    # Turn equation into jQuery object and replace each token with its data-id.
+    equation = $('<p>' + equation + '</p>')
+    equation.children('.token').each ->
+      $(this).replaceWith('#' + $(this).data('id') + '#')
 
     # if @options.operators
     #   equation.children('.operator').each ->
