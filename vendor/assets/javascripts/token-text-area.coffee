@@ -327,7 +327,8 @@ class TokenTextArea
 
     self = @
     $('.remove-filter').click( () ->
-      self.removeItem($(@).data('id'))
+      $(this).parent().remove()
+      self.saveEquation()
     )
     
     # Check with server to find if expression is valid.
