@@ -40,6 +40,7 @@ class TokenTextArea
   registerEvents: ->
     @input.on "keyup", =>
 
+      @maybeFixSquishedCaret()
       clearTimeout(@typingTimer) unless @typingTimer is null
       @typingTimer = setTimeout( =>
         # Store selected range (used to recover position when autocomplete menu is clicked).
@@ -58,6 +59,7 @@ class TokenTextArea
     @input.on "keydown", (event) =>
       clearTimeout(@typingTimer) unless @typingTimer is null
 
+      @maybeFixSquishedCaret()
       switch event.which
         when 13 # Enter
           @kill(event)
@@ -67,9 +69,14 @@ class TokenTextArea
             @addItem(@resultList.find("li").first())
 
         when 8 # Backspace
+          @range = @getRange()
+          parent = @range.commonAncestorContainer.parentElement
+          if !parent.classList.contains('token-text-area-input')
+            lastChild = @input.children().last()
+            if @input.text().substr(@input.text().length - lastChild.text().length) == lastChild.text()# && !(@input.html().substr(-6) == '&nbsp;')
+              @kill(event)
+              lastChild.remove()
           if @options.operators
-            @range = @getRange()
-            parent = @range.commonAncestorContainer.parentElement
             if parent.classList.contains('operator')
               parent.parentNode.removeChild(parent)
 
@@ -84,10 +91,12 @@ class TokenTextArea
             @selectNextResult(-1)
 
     @input.on "click", (event) =>
+      @maybeFixSquishedCaret()
       # When the user clicks into the editor, check if they have clicked on a partial token to be completed.
       @checkAutocomplete()
 
     @input.on "blur", (event) =>
+      @input.children().removeClass('squish-selected')
       # When the user clicks out of the editor, wait a tick to get the active item- if they did not click on the
       # autocomplete menu, close it.
       setTimeout( =>
@@ -342,6 +351,32 @@ class TokenTextArea
       range = document.selection.createRange()
     range.collapse(true)
     range
+
+  # in webkit, when the caret is between a contenteditable=false div and a the
+  # end, it disappears or flashes to the end of the div. This gives the user a
+  # helpful hint that the caret is still where they think it is
+  maybeFixSquishedCaret: ->
+    @input.children().removeClass('squish-selected')
+    lastChild = @input.children().last()
+    if @input.text().substr(@input.text().length - lastChild.text().length) == lastChild.text() && @isCaretAtEnd()
+      lastChild.addClass('squish-selected')
+
+  isCaretAtEnd: ->
+    atEnd = false
+    if window.getSelection
+      sel = window.getSelection()
+      if sel.rangeCount
+        range = sel.getRangeAt(0)
+        testRange = range.cloneRange()
+        testRange.selectNodeContents @input[0]
+        testRange.setStart range.endContainer, range.endOffset
+        atEnd = testRange.toString() == ''
+    else if document.selection and document.selection.type != 'Control'
+      range = document.selection.createRange()
+      testRange.moveToElementText @input[0]
+      testRange.setEndPoint 'StartToEnd', range
+      atEnd = testRange.text == ''
+    return atEnd
 
   getWord: ->
     # Determine the length of text in the input.
