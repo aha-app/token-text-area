@@ -1,14 +1,14 @@
 {
-  "name": "token-text-area",
+  "name": "@aha-app/token-text-area",
   "version": "1.2.2",
   "description": "Text area with uneditable tokens for editing equations.",
   "main": "vendor/assets/javascripts/token-text-area.coffee",
   "directories": {
     "example": "examples"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "files": [
+    "vendor/assets/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/k1w1/token-text-area.git"
